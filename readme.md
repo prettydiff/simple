@@ -6,10 +6,12 @@ An eductional language to speed learning of logic and automation with sacrifice 
 ## Todo
 * investigate Set containers
 * need to define data types and type extension
-* apply DEC64 for number type
+* choose a number system that is more precise than IEEE double floating point precision, here are some candidates:
+   - DEC64
+   - libdfp
 * write a parser/repl
 * define default methods
-* evaluate DEC64 to determine if words can start with numbers
+* evaluate chosen number format to determine if words can start with numbers
 * consider additional forms of loops
 * consider additional forms of conditions, possibly switch/case (but no fall through)
 * modules
@@ -111,7 +113,7 @@ Words may be comprised of any Unicode character with exception to the following 
    - 'dog'
    - "bird\\"s"
    - 'book"s'
-* number - This language features a single number type based upon DEC64.
+* number - This language features a single number type based upon chosen number format.
    - 0
    - 12345678
    - -23
@@ -278,7 +280,7 @@ The words in this list cannot be used as names of references
    - Does not take any arguments.
    - Returns a new string.
    - `"A Boy And His Car"["lowerCase"](); // returns "a boy and his car" //`
-* **numeric** - Determines if the string value resembles a DEC64 number.
+* **numeric** - Determines if the string value resembles a number in the chosen number format.
    - Does not take any arguments.
    - Returns a boolean
    - `"1234"["numeric"](); // returns true //`
