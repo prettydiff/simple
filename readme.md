@@ -247,6 +247,54 @@ The words in this list cannot be used as names of references
 
 
 
+## Standard methods
+### Strings
+* **charAt** - Grab a string character at a given index of the string.
+   - Takes a number as input.
+   - Returns a string character.
+   - Returns -1 if an invalid index is supplied.
+   - `"abc"["charAt"](1); //returns "b" //`
+* **charPointAt** - Provides a number indicating the code point in Unicode for a character at the given index of a string.
+   - Takes a number as input.
+   - Returns a number.
+   - Returns -1 if an invalid index is supplied.
+   - `"𐃿"["codePointAt"](0); // returns 65791 //`
+* **includes** - Returns a boolean if a substring resides in the target string.
+   - Takes a string as input.
+   - Returns a boolean.
+   - `"a cat sleeps all day"["indexOf"]("cat"); // returns true //`
+   - `"a cat sleeps all day"["indexOf"]("boat"); // returns false //`
+* **indexOf** - Returns a number indicating the character index where a substring first resides in the target string when searching from left to right.
+   - Takes a string as input.
+   - Returns a number.
+   - Returns -1 if the substring is not present in the target string.
+   - `"a cat sleeps all day with another cat"["indexOf"]("cat"); // returns 2 //`
+* **lastIndexOf** - Returns a number indicating the character index where a substring first resides in the target string when searching from right to left.
+   - Takes a string as input.
+   - Returns a number.
+   - Returns -1 if the substring is not present in the target string.
+   - `"a cat sleeps all day with another cat"["indexOf"]("cat"); // returns 34 //`
+* **lowerCase** - Returns a new string composed of all lowercase characters.
+   - Does not take any arguments.
+   - Returns a new string.
+   - `"A Boy And His Car"["lowerCase"](); // returns "a boy and his car" //`
+* **numeric** - Determines if the string value resembles a DEC64 number.
+   - Does not take any arguments.
+   - Returns a boolean
+   - `"1234"["numeric"](); // returns true //`
+   - `"doggy"["numeric"](); // returns false //`
+* **split** - Creates an array by dividing a target string on a supplied substring.
+   - Takes a string as input.
+   - Returns an array.
+   - `"a"["split"]("b"); // returns ["a"] //`
+   - `"abcbc"["split"]("b"); // returns ["a", "c", "c"] //`
+* **upperCase** - Returns a new string composed of all uppercase characters.
+   - Does not take any arguments.
+   - Returns a new string.
+   - `"A Boy And His Car"["upperCase"](); // returns "A BOY AND HIS CAR"`
+
+
+
 ## Error states
 This is an incomplete list of things that will throw an error in this language.
 
@@ -254,6 +302,7 @@ This is an incomplete list of things that will throw an error in this language.
 * Reassign a value to a referrence of a different data type
 * Access a property of a referrence with a null value
 * Perform arithmetic on non-number data types
+* Attempt to execute any data type as a function/block if they are not functions or blocks.
 
 ### Reference errors
 * Attempt to create a reference with a reserved name from the keywords and global reference list.
