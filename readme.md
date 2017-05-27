@@ -60,7 +60,7 @@ These are all problems that can be solved provided the language were designed wi
 ### Assignment/reference operators
 * : assignment
 * ? ternary primary 
-* # ternary secondary (else)
+* \# ternary secondary (else)
 * , list separator
 
 ### Arithmetic operators
@@ -85,10 +85,10 @@ Words may be comprised of any Unicode character with exception to the following 
 * No binary/control characters
 * No characters specified in the syntax section
 * None of these specific characters as they are reserved for future use
-   - \`
-   - @
-   - $
-   - .
+   - \` (acent)
+   - @ (at symbol)
+   - $ (dollar)
+   - . (period)
 
 
 
