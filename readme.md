@@ -1,6 +1,8 @@
 # Simple Language
 An eductional language to speed learning of logic and automation with sacrifice to convention and syntax.
 
+
+
 ## Todo
 * investigate Set containers
 * need to define data types and type extension
@@ -10,8 +12,15 @@ An eductional language to speed learning of logic and automation with sacrifice 
 
 
 
+## Motivation
+According to data from multiple sources JavaScript is the most popular language in the world.  Unfortunately, it is rarely formally taught, and most developers cannot adequetely figure it out so as to become competent without significant help.  Worse still is that there are many pitfalls in JavaScript that frequently trip up and slow down seasoned experts without some help from static analysis tools.  Worst of all is that JavaScript has no shortage of controversy and inflated holy wars.
+
+These are all problems that can be solved provided the language were designed with these problems in mind.  Simple language is designed to be single paradigm with a cleaner syntax.  It will take the best parts of JavaScript and eliminate opportunities for frustration and controversy along the way.
+
+
+
 ## Design theory
-* native lexical scoped by block
+* block scoped and lexical scope natively by default
 * garbage collected
 * no hoisting
 * the only white space are white space characters found in strings
