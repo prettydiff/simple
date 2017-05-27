@@ -9,6 +9,17 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * apply DEC64 for number type
 * write a parser/repl
 * define default methods
+* evaluate DEC64 to determine if words can start with numbers
+* loops
+    - do/while
+    - foreach can be a property of Store
+* conditions
+    - if
+    - possibly switch/case (but no fall through)
+* modules
+* define errors
+* in JavaScript functions have internal identity by name, but in this language functions dont have names... evaluate if there is a problem with force reliance upon the scope chain for recursion in functions and assigned blocks
+* document explicit error states
 
 
 
@@ -23,7 +34,7 @@ These are all problems that can be solved provided the language were designed wi
 * block scoped and lexical scope natively by default
 * garbage collected
 * no hoisting
-* the only white space are white space characters found in strings
+* the only white space are white space characters found in strings and comments
 * no inheritance/this/new
 * implicit public/private
 * no try/catch
@@ -85,7 +96,7 @@ Words may be comprised of any Unicode character with exception to the following 
 * No binary/control characters
 * No characters specified in the syntax section
 * None of these specific characters as they are reserved for future use
-   - `&#96;` (acent)
+   - \` (acent)
    - `@` (at symbol)
    - `$` (dollar)
    - `.` (period)
@@ -98,7 +109,7 @@ Words may be comprised of any Unicode character with exception to the following 
 * string - Strings are delimited by single and double quote characters and store a raw sequence of text characters.
    - "cat"
    - 'dog'
-   - "bird\"s"
+   - "bird\\"s"
    - 'book"s'
 * number - This language features a single number type based upon DEC64.
    - 0
@@ -138,7 +149,7 @@ Words may be comprised of any Unicode character with exception to the following 
    - Items in a set return the item of reference or null in the case where item is reference but not present in the set.
    - `animals[myFunction] // returns myFunction //`
    - `animals[myCat] // returns null //`
-* block - A bag of instructions that always returns null. The block code is the literal value.
+* block - A bag of instructions that always returns itself. The block code is the literal value.
    - Declared by assignment to a block, similar to a function but without the preceeding parenthesis.
    - `animals: {code instructions go in here;}`
    - Executed when a parethesis grouping follows the block's reference.
@@ -193,3 +204,25 @@ if (y = 3) {
     instructions["length"]; // 45 //
 }
 ```
+
+
+
+## Keywords and globals
+
+
+
+## Loops
+
+
+
+## Conditions
+
+
+
+## Error states
+This is an incomplete list of things that will throw an error in this language.
+
+* Reassign a value to a referrence of a different data type
+* Access a property of a referrence with a null value
+* Access a reference that is not declared in the scope chain
+* Perform arithmetic on non-number data types
