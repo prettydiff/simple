@@ -10,23 +10,20 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * write a parser/repl
 * define default methods
 * evaluate DEC64 to determine if words can start with numbers
-* loops
-    - do/while
-    - foreach can be a property of Store
-* conditions
-    - if
-    - possibly switch/case (but no fall through)
+* consider additional forms of loops
+* consider additional forms of conditions, possibly switch/case (but no fall through)
 * modules
 * define errors
 * in JavaScript functions have internal identity by name, but in this language functions dont have names... evaluate if there is a problem with force reliance upon the scope chain for recursion in functions and assigned blocks
 * document explicit error states
+* Allowing implicit coercion of null to boolean false in expression to eliminate need for some null checks.  This convenience may or may not be a good idea and will need to be revisited in practice.
 
 
 
 ## Motivation
 According to data from multiple sources JavaScript is the most popular language in the world.  Unfortunately, it is rarely formally taught, and most developers cannot adequetely figure it out so as to become competent without significant help.  Worse still is that there are many pitfalls in JavaScript that frequently trip up and slow down seasoned experts without some help from static analysis tools.  Worst of all is that JavaScript has no shortage of controversy and inflated holy wars.
 
-These are all problems that can be solved provided the language were designed with these problems in mind.  Simple language is designed to be single paradigm with a cleaner syntax.  It will take the best parts of JavaScript and eliminate opportunities for frustration and controversy along the way.
+These are all problems that can be solved provided the language were designed with these problems in mind.  Simple Language is designed to be single paradigm with a cleaner syntax.  It will take the best parts of JavaScript and eliminate opportunities for frustration and controversy along the way.
 
 
 
@@ -40,6 +37,7 @@ These are all problems that can be solved provided the language were designed wi
 * no try/catch
 * no operator overloading
 * no bitwise
+* no implied syntax or automatic syntax character insertion.  Syntax is explicit.
 * data types are strong/static
 
 
@@ -93,8 +91,10 @@ These are all problems that can be solved provided the language were designed wi
 Words may be comprised of any Unicode character with exception to the following list:
 
 * No white space characters
+* case sensitive
 * No binary/control characters
 * No characters specified in the syntax section
+* References cannot be named any of the defined keywords or globals
 * None of these specific characters as they are reserved for future use
    - \` (acent)
    - `@` (at symbol)
@@ -117,8 +117,8 @@ Words may be comprised of any Unicode character with exception to the following 
    - -23
    - -123.45678912
 * boolean - true or false
-* regex - JavaScript style regular expressions
-* null - only exists to unset a value from a reference
+* regex - JavaScript style regular expressions.
+* null - Null only exists to unset a value from a reference. In expressions null values are coerced to a boolean false value so that they can be positively compared to either null or false without explicit need for a null check.  If a reference needs to be evaluated against literal null check the reference's type to ensure it isn't a boolean.
 
 #### Non-primitives (passed by reference)
 * function - A bag of instructions that accepts parameters for input and always returns a value, where that value is null by default.
@@ -158,6 +158,7 @@ Words may be comprised of any Unicode character with exception to the following 
    - `animal; // returns the block itself //`
 
 The types array, hash, map, and set are all iterable.  Except for arrays, the contents of these types reside in the order with which they were added.
+
 
 
 ## Declarations
@@ -208,21 +209,51 @@ if (y = 3) {
 
 
 ## Keywords and globals
+The words in this list cannot be used as names of references
+
+* `break` - Terminates and exits a loop.
+* `const` - 
+* `do` - A basic loop.  The `do` keyword is required followed by a block followed by the `until` keyword followed by parenthesis group wrapping an expression.
+   - `do myBlock until (x = 5);`
+* `else` - An alternate block of execution when other branches in a chain of `if` and `elseif` (if present) conditions evaluate to false.
+   -  `if (x > 1) myBlock else otherBlock;`
+* `elseif` - An alternate branch in a chain of conditions.  Requires a fully formed `if` statement and 0 or more fully formed `elseif` statements then the `elseif` keyword followed by a parenthesis grouping containing an expression and finally a block to execute.
+   - `if (x > 1) myBlock elseif (x < 0) negativeBlock else otherBlock;`
+* `if` - Basic condition.  Requires the keyword `if` followed by a parenthesis grouping containing an expression, which is then followed by a block to execute if the condition evaluates to true.
+   - `if (x > 1) myBlock;`
+   - `if (x > 1) {myBoolean: true;}`
+* `null` - A global reserved reference to the null data type.
+* `return` - Terminates and exits a block.  In the case of a function a statement starting with the return keyword is the value returned from the function.
+* `Store` - The global utility allowing data containers and features upon them.
+* `until` - Part of a `do`/`until` loop separating the loop's block from its breaking expression.
 
 
 
 ## Loops
+* `do`/`until` - A loop that executes repetive logic and breaks only when its `until` expression evaluates to false or when a `break` keyword is executed.
+   - `do myBlock until (x = 5);`
+* foreach - Arrays, hashes, maps, and sets can be iteracted using the Store's foreach method.  The foreach method traverses every item in the iteration once from beginning to end without deviation or early termination.
+   - `Store["foreach"](myArray)`
 
 
 
 ## Conditions
+* `if`/`elseif`/`else` - A form of logic branching based upon evaluation of one or more expressions optionally followed by a default.
+   - `if (x > 1) myBlock;`
+   - `if (x > 1) {myBoolean: true;}`
+   - `if (x > 1) myBlock elseif (x < 0) negativeBlock else otherBlock;`
+   - `if (x > 1) myBlock else otherBlock;`
 
 
 
 ## Error states
 This is an incomplete list of things that will throw an error in this language.
 
+### Type errors
 * Reassign a value to a referrence of a different data type
 * Access a property of a referrence with a null value
-* Access a reference that is not declared in the scope chain
 * Perform arithmetic on non-number data types
+
+### Reference errors
+* Attempt to create a reference with a reserved name from the keywords and global reference list.
+* Access a reference that is not declared in the scope chain
