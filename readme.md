@@ -173,7 +173,7 @@ References are declared using the `let` and `const` functions. These functions m
 ### Default values and data types
 All references are declared as a word assigned to a value.  The value may be of any supported data type except null.  Null data types will not be allowed as a default type and will throw an error when such conditions occur.  This assignment determines the reference's default value and data type. The data type of the value is written to a read only property of the reference named `type`. 
 
-### Univeral data properties
+### Universal data properties
 All references have a type and length propery, of which both are read only. The length property offers a different meaning depending upon the data type and is calculated upon request.  Here is a description of the meaning of `length` by `type` value:
 
 * string - the character length of the string value
