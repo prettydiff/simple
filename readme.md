@@ -39,15 +39,15 @@ These are all problems that can be solved provided the language were designed wi
 
 
 
-## Operators
-### Comparison operators:
+## Syntax
+### Comparison operators
 * = equality
 * ~ inequality
 * < less than
 * \> greater than
 * <=> trichotomy // returns -1, 0, or 1 if respectively: less, equal, or greater //
 
-### Grouping operators:
+### Grouping operators
 * ( logical group start
 * ) logical group end
 * { block start
@@ -56,26 +56,39 @@ These are all problems that can be solved provided the language were designed wi
 * ] array notation end
 * & logical and
 * | logical or
-* ; statement termination
 
-### Assignment/reference operators:
+### Assignment/reference operators
 * : assignment
-* ? ternary
-* | ternary else
-* . object property
+* ? ternary primary 
+* # ternary secondary (else)
 * , list separator
 
-### Arithmetic operators:
-* + addition
-* - subtraction
-* * multiplication
+### Arithmetic operators
+* \+ addition
+* \- subtraction
+* \* multiplication
 * / division
 * ^ exponentiation
 * % modulo
 
-### Other operators:
+### Other operators
 * ! string concatenation
 * \ escape sequence
+* ; statement termination
+* " string delimiter
+* ' string delimiter
+
+### Words: keywords and references
+Words may be comprised of any Unicode character with exception to the following list:
+
+* No white space characters
+* No binary/control characters
+* No characters specified in the syntax section
+* None of these specific characters as they are reserved for future use
+   - \`
+   - @
+   - $
+   - .
 
 
 
