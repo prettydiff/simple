@@ -34,7 +34,7 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * = equality
 * ~ inequality
 * < less than
-* > greater than
+* \> greater than
 * <=> trichotomy // returns -1, 0, or 1 if respectively: less, equal, or greater
 
 ### Grouping operators:
