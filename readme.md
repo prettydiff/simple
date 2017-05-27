@@ -85,7 +85,7 @@ Words may be comprised of any Unicode character with exception to the following 
 * No binary/control characters
 * No characters specified in the syntax section
 * None of these specific characters as they are reserved for future use
-   - `\`` (acent)
+   - `\` ` (acent)
    - `@` (at symbol)
    - `$` (dollar)
    - `.` (period)
