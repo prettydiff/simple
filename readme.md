@@ -212,7 +212,7 @@ if (y = 3) {
 The words in this list cannot be used as names of references
 
 * `break` - Terminates and exits a loop.
-* `const` - 
+* `const` - A function implicitly available to every block and function for declaration of references that cannot be reassigned to a different value.
 * `do` - A basic loop.  The `do` keyword is required followed by a block followed by the `until` keyword followed by parenthesis group wrapping an expression.
    - `do myBlock until (x = 5);`
 * `else` - An alternate block of execution when other branches in a chain of `if` and `elseif` (if present) conditions evaluate to false.
@@ -222,6 +222,7 @@ The words in this list cannot be used as names of references
 * `if` - Basic condition.  Requires the keyword `if` followed by a parenthesis grouping containing an expression, which is then followed by a block to execute if the condition evaluates to true.
    - `if (x > 1) myBlock;`
    - `if (x > 1) {myBoolean: true;}`
+* `let` - A function implicitly available to every block and function for declaration of references that can be reassigned to a different value of the same data type.
 * `null` - A global reserved reference to the null data type.
 * `return` - Terminates and exits a block.  In the case of a function a statement starting with the return keyword is the value returned from the function.
 * `Store` - The global utility allowing data containers and features upon them.
