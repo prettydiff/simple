@@ -5,7 +5,8 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * investigate Set containers
 * need to define data types and type extension
 * apply DEC64 for number type
-* how to identify data type if reference is assigned to null
+* write a parser/repl
+* define default methods
 
 
 
@@ -35,7 +36,7 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * ~ inequality
 * < less than
 * \> greater than
-* <=> trichotomy // returns -1, 0, or 1 if respectively: less, equal, or greater
+* <=> trichotomy // returns -1, 0, or 1 if respectively: less, equal, or greater //
 
 ### Grouping operators:
 * ( logical group start
