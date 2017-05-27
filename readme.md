@@ -106,7 +106,7 @@ Words may be comprised of any Unicode character with exception to the following 
 ## Data Types
 ### Definitions
 #### Primitives (passed by value)
-* string - Strings are delimited by single and double quote characters and store a raw sequence of text characters.
+* string - Strings are delimited by single and double quote characters and store a raw sequence of text characters. Strings may contain any manner of white space and span across multiple lines.
    - "cat"
    - 'dog'
    - "bird\\"s"
@@ -211,22 +211,22 @@ if (y = 3) {
 ## Keywords and globals
 The words in this list cannot be used as names of references
 
-* `break` - Terminates and exits a loop.
-* `const` - A function implicitly available to every block and function for declaration of references that cannot be reassigned to a different value.
-* `do` - A basic loop.  The `do` keyword is required followed by a block followed by the `until` keyword followed by parenthesis group wrapping an expression.
+* **break** - Terminates and exits a loop.
+* **const** - A function implicitly available to every block and function for declaration of references that cannot be reassigned to a different value.
+* **do** - A basic loop.  The `do` keyword is required followed by a block followed by the `until` keyword followed by parenthesis group wrapping an expression.
    - `do myBlock until (x = 5);`
-* `else` - An alternate block of execution when other branches in a chain of `if` and `elseif` (if present) conditions evaluate to false.
+* **else** - An alternate block of execution when other branches in a chain of `if` and `elseif` (if present) conditions evaluate to false.
    -  `if (x > 1) myBlock else otherBlock;`
-* `elseif` - An alternate branch in a chain of conditions.  Requires a fully formed `if` statement and 0 or more fully formed `elseif` statements then the `elseif` keyword followed by a parenthesis grouping containing an expression and finally a block to execute.
+* **elseif** - An alternate branch in a chain of conditions.  Requires a fully formed `if` statement and 0 or more fully formed `elseif` statements then the `elseif` keyword followed by a parenthesis grouping containing an expression and finally a block to execute.
    - `if (x > 1) myBlock elseif (x < 0) negativeBlock else otherBlock;`
-* `if` - Basic condition.  Requires the keyword `if` followed by a parenthesis grouping containing an expression, which is then followed by a block to execute if the condition evaluates to true.
+* **if** - Basic condition.  Requires the keyword `if` followed by a parenthesis grouping containing an expression, which is then followed by a block to execute if the condition evaluates to true.
    - `if (x > 1) myBlock;`
    - `if (x > 1) {myBoolean: true;}`
-* `let` - A function implicitly available to every block and function for declaration of references that can be reassigned to a different value of the same data type.
-* `null` - A global reserved reference to the null data type.
-* `return` - Terminates and exits a block.  In the case of a function a statement starting with the return keyword is the value returned from the function.
-* `Store` - The global utility allowing data containers and features upon them.
-* `until` - Part of a `do`/`until` loop separating the loop's block from its breaking expression.
+* **let** - A function implicitly available to every block and function for declaration of references that can be reassigned to a different value of the same data type.
+* **null** - A global reserved reference to the null data type.
+* **return** - Terminates and exits a block.  In the case of a function a statement starting with the return keyword is the value returned from the function.
+* **Store** - The global utility allowing data containers and features upon them.
+* **until** - Part of a `do`/`until` loop separating the loop's block from its breaking expression.
 
 
 
