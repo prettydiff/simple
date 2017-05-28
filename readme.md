@@ -18,6 +18,7 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * in JavaScript functions have internal identity by name, but in this language functions dont have names... evaluate if there is a problem with force reliance upon the scope chain for recursion in functions and assigned blocks
 * document explicit error states
 * Allowing implicit coercion of null to boolean false in expression to eliminate need for some null checks.  This convenience may or may not be a good idea and will need to be revisited in practice.
+* The return keyword will terminate a block.  Investigate if this is a problem where a function contains numerous blocks.
 
 
 
@@ -133,13 +134,13 @@ Words may be comprised of any Unicode character with exception to the following 
 * null - Null only exists to unset a value from a reference. In expressions null values are coerced to a boolean false value so that they can be positively compared to either null or false without explicit need for a null check.  If a reference needs to be evaluated against literal null check the reference's type to ensure it isn't a boolean.
 
 #### Non-primitives (passed by reference)
-* function - A bag of instructions that accepts parameters for input and always returns a value, where that value is null by default.
+* function - A bag of instructions that accepts parameters for input and always returns a value, where that value is the function itself by default.
    - Declared by applying a parenthsis grouping prior to a block.
    - `cat: () {console.log("meow");}`
    - Executed when a parethesis grouping follows the function's reference.
-   - `cat(); // returns null because the function does not specify a return value //`
+   - `cat(); // returns the actual function because a return value isn't specific and executes its instructions //`
    - Without the following parenthesis the reference to the function itself is passed without executing the function.
-   - `cat; // returns the actual function //`
+   - `cat; // returns the actual function without executing its instructions //`
 * array - A list of dynamic length where keys are 0 based incrementing integers and values are of any data type. Every index must have a value.  Sparse arrays will throw an error.
    - Declared by use of the global Store hash's array property.
    - `animals: Store.array("cat", "dog", "parrot")`
@@ -223,7 +224,7 @@ if (y = 3) {
 ## Keywords and globals
 The words in this list cannot be used as names of references
 
-* **break** - Terminates and exits a loop.
+* **break** - Terminates and exits a do/until loop.
 * **const** - A function implicitly available to every block and function for declaration of references that cannot be reassigned to a different value.
 * **do** - A basic loop.  The `do` keyword is required followed by a block followed by the `until` keyword followed by parenthesis group wrapping an expression.
    - `do myBlock until (x = 5);`
@@ -260,6 +261,12 @@ The words in this list cannot be used as names of references
 
 
 ## Standard methods
+### Numbers
+* **integer** - Determines if the number is an integer and returns a boolean.
+   - No input is accepted.
+   - Returns a number.
+   - `1234["integer"](); // returns true //`
+
 ### Strings
 * **charAt** - Grab a string character at a given index of the string.
    - Takes a number as input.
@@ -271,6 +278,10 @@ The words in this list cannot be used as names of references
    - Returns a number.
    - Returns -1 if an invalid index is supplied.
    - `"𐃿"["codePointAt"](0); // returns 65791 //`
+* **count** - Counts how many times a substring resides in the target.
+   - Takes a string as input.
+   - Returns a number.
+   - `"a cat glances upon a star in a dark sky"["count"]("a"); // returns 7 //`
 * **includes** - Returns a boolean if a substring resides in the target string.
    - Takes a string as input.
    - Returns a boolean.
@@ -291,10 +302,15 @@ The words in this list cannot be used as names of references
    - Returns a new string.
    - `"A Boy And His Car"["lowerCase"](); // returns "a boy and his car" //`
 * **numeric** - Determines if the string value resembles a number in the chosen number format.
-   - Does not take any arguments.
-   - Returns a boolean
+   - No input is accepted.
+   - Returns a boolean.
    - `"1234"["numeric"](); // returns true //`
    - `"doggy"["numeric"](); // returns false //`
+* **parseNumber** - Produces a number from a numeric string.  If the string is not numeric it returns 0.
+   - No input is accepted.
+   - Returns a number.
+   - `"1234"["parseNumber"](); // returns 1234 //`
+   - `"123a5"["parseNumber"](); // returns 0 //`
 * **split** - Creates an array by dividing a target string on a supplied substring.
    - Takes a string as input.
    - Returns an array.
@@ -303,7 +319,7 @@ The words in this list cannot be used as names of references
 * **upperCase** - Returns a new string composed of all uppercase characters.
    - Does not take any arguments.
    - Returns a new string.
-   - `"A Boy And His Car"["upperCase"](); // returns "A BOY AND HIS CAR"`
+   - `"A Boy And His Car"["upperCase"](); // returns "A BOY AND HIS CAR" //`
 
 
 
