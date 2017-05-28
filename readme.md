@@ -19,7 +19,7 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * document explicit error states
 * Allowing implicit coercion of null to boolean false in expression to eliminate need for some null checks.  This convenience may or may not be a good idea and will need to be revisited in practice.
 * The return keyword will terminate a block.  Investigate if this is a problem where a function contains numerous blocks.
-* a random number method
+* a random number method, possibly a global Math object with various methods for things like sin, cosine, tangent
 
 
 
