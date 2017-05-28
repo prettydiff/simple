@@ -224,6 +224,7 @@ if (y = 3) {
 ## Keywords and globals
 The words in this list cannot be used as names of references
 
+* **argument** - A value passed into a function.  Same as parameter.
 * **break** - Terminates and exits a do/until loop.
 * **const** - A function implicitly available to every block and function for declaration of references that cannot be reassigned to a different value.
 * **do** - A basic loop.  The `do` keyword is required followed by a block followed by the `until` keyword followed by parenthesis group wrapping an expression.
@@ -237,6 +238,7 @@ The words in this list cannot be used as names of references
    - `if (x > 1) {myBoolean: true;}`
 * **let** - A function implicitly available to every block and function for declaration of references that can be reassigned to a different value of the same data type.
 * **null** - A global reserved reference to the null data type.
+* **parameter** - A value passed into a function.  Same as argument.
 * **return** - Terminates and exits a block.  In the case of a function a statement starting with the return keyword is the value returned from the function.
 * **Store** - The global utility allowing data containers and features upon them.
 * **until** - Part of a `do`/`until` loop separating the loop's block from its breaking expression.
@@ -262,10 +264,33 @@ The words in this list cannot be used as names of references
 
 ## Standard methods
 ### Numbers
+* **ceiling** - Rounds a non-integer to the next higher integer.
+   - No input is accepted.
+   - Returns a number.
+   - `1234.1687["ceiling"](); // returns 1235 //`
+   - `1234["ceiling"](); // returns 1234 //`
+* **floor** - Converts a number into an integer without any rounding.
+   - No input is accepted.
+   - Returns a number.
+   - `1234.5687["floor"](); // returns 1234 //`
 * **integer** - Determines if the number is an integer and returns a boolean.
    - No input is accepted.
    - Returns a number.
    - `1234["integer"](); // returns true //`
+   - `1234.4567["integer"](); // returns false //`
+   - `-1234["integer"](); // returns true//`
+* **round** - Rounds a number.
+   - Optionally takes a number to determine how many digits to the right of the decimal the number should be rounded.  This arugment is ignored if the target number is an integer.  If the number is greater than the decimal precision of the target number then the original number is returned.  This argument defaults to 0.
+   - Returns a number.
+   - `1234.5678["round"](); // returns 1235 //`
+   - `1234.5678["round"](2); // returns 1234.57 //`
+   - `1234.5678["round"](6); // returns 1234.5678 //`
+* **toPrecision** - Cuts a number down to the specified number of digits. Similar to the round method, but the final digit isn't rounded.
+   - Optionally takes a number to determine the number of digits to preserve to the right of the decimal.  If the argument is absent a value of 0 is used to produce an integer. If the supplied number is greater than the number of digits to the right of the decimal the original number is returned.
+   - Returns a number.
+   - `1234.5678["toPrecision"](2); // returns 1234.56 //`
+   - `1234.5678["toPrecision"](6); // returns 1234.5678 //`
+   - `1234.5678["toPrecision"](); // returns 1234 //`
 
 ### Strings
 * **charAt** - Grab a string character at a given index of the string.
@@ -359,6 +384,7 @@ This is an incomplete list of things that will throw an error in this language.
 * Perform arithmetic on non-number data types
 * Attempt to execute any data type as a function/block if they are not functions or blocks.
 * Pass a standard type name into the second argument on the *Store["modifyType"]* method.
+* Pass the incorrect data type into a method.
 
 ### Reference errors
 * Attempt to create a reference with a reserved name from the keywords and global reference list.
