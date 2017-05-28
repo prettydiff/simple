@@ -5,7 +5,6 @@ An eductional language to speed learning of logic and automation with sacrifice 
 
 ## Todo
 * investigate Set containers
-* need to define data types and type extension
 * choose a number system that is more precise than IEEE double floating point precision, here are some candidates:
    - DEC64
    - libdfp
@@ -41,6 +40,17 @@ These are all problems that can be solved provided the language were designed wi
 * no bitwise
 * no implied syntax or automatic syntax character insertion.  Syntax is explicit.
 * data types are strong/static
+
+
+
+## Definition of terms
+* **block** - A block is a bag of instructions. Blocks always begin with an opening curly brace and end with a closing curly brace.  Blocks provide scope and references may be declared in any block.
+* **expression** - An expression is a bit of code that asks the computer for an opinion, called evaluation.  This could be as simple as comparing one number to another number or checking the length of a string.  Expressions are wrapped in parentheses.
+* **method** - A function accessed as the property of a reference.
+* **object** - A generic term for any non-primitive data type.
+* **property** - A subreferrence accessed through a reference.  Properties are always accessed with square braces.
+* **reference** - A named assigned to a primitive or object.
+* **statement** - A statement is an action.  It can be as primitive as simply calling a reference, or it can provide a multitude of instructions.  Statements are terminated with semicolons.
 
 
 
@@ -164,7 +174,7 @@ The types array, hash, map, and set are all iterable.  Except for arrays, the co
 
 
 ## Declarations
-Word tokens in this language are either keywords declared by the language or references declared by a user. Undeclared words will throw an error. All references must be declared.
+Word tokens in this language are either keywords declared by the language or references declared by a user. Undeclared words will throw an error. All references must be declared, and must be declared before they are referrenced.
 
 ### Scope
 References are globally scoped if declared outside a block or scoped to the block in which they are declared. Child blocks have access to read and write to references declared in containing blocks. Containing blocks cannot access references declared in child/descendant blocks.
@@ -297,6 +307,33 @@ The words in this list cannot be used as names of references
 
 
 
+## Custom Data Types
+Simple Language provideds a method *modifyType* on the Store hash for creating custom data types.  This method has special access to write a custom value to the read only *type* property on a reference.  This method takes two arguments: a reference to modify and a string for the new type value.  Any string is allowed except for the names of the standard types.  This means that once a reference is converted to a custom type it cannot be reverted back to a standard type.
+
+Perhaps the most direct means is to define a function that creates a reference from a base type, extends that reference in a uniform way, and returns this reference.  Here is an example of creating a type named *shortString*:
+```
+let(
+    shortString: (value) {
+        Store["modifyType"](value, "shortString");
+        return value["slice"](0, 3);
+    },
+    myTinyString: shortString("abracadabra")
+);
+```
+
+The function that creates a custom type may be created anywhere, such as the local function created in the example above.  Sometimes a standard location is preferred for cleaner organization of code.  In this case it could be wise to store this capability in the global Store hash as in this example:
+```
+Store["shortString"]: (value) {
+    Store["modifyType"](value, "shortString");
+    return value["slice"](0, 3);
+};
+let(
+    myTinyString: Store["shortString"]("abracadabra")
+);
+```
+
+
+
 ## Error states
 This is an incomplete list of things that will throw an error in this language.
 
@@ -305,7 +342,9 @@ This is an incomplete list of things that will throw an error in this language.
 * Access a property of a referrence with a null value
 * Perform arithmetic on non-number data types
 * Attempt to execute any data type as a function/block if they are not functions or blocks.
+* Pass a standard type name into the second argument on the *Store["modifyType"]* method.
 
 ### Reference errors
 * Attempt to create a reference with a reserved name from the keywords and global reference list.
 * Access a reference that is not declared in the scope chain
+* Any attempt to overwrite or reassign a standard property of the *Store* hash.
