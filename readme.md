@@ -14,19 +14,18 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * consider additional forms of loops
 * consider additional forms of conditions, possibly switch/case (but no fall through)
 * modules
-* define errors
-* in JavaScript functions have internal identity by name, but in this language functions dont have names... evaluate if there is a problem with force reliance upon the scope chain for recursion in functions and assigned blocks
+* define error states
 * document explicit error states
 * Allowing implicit coercion of null to boolean false in expression to eliminate need for some null checks.  This convenience may or may not be a good idea and will need to be revisited in practice.
 * The return keyword will terminate a block.  Investigate if this is a problem where a function contains numerous blocks.
-* a random number method, possibly a global Math object with various methods for things like sin, cosine, tangent
+* a random number method, possibly a global Math object with various methods for things like E, PI, min, max
 
 
 
 ## Motivation
-According to data from multiple sources JavaScript is the most popular language in the world.  Unfortunately, it is rarely formally taught, and most developers cannot adequetely figure it out so as to become competent without significant help.  Worse still is that there are many pitfalls in JavaScript that frequently trip up and slow down seasoned experts without some help from static analysis tools.  Worst of all is that JavaScript has no shortage of controversy and inflated holy wars.
+According to data from multiple sources JavaScript is the most popular language in the world.  Unfortunately, it is rarely formally taught, and most developers cannot adequetely figure it out so as to become competent without significant help.  Worse still is that there are many pitfalls in JavaScript that frequently trip up and slow down seasoned experts without help from static analysis tools.  Worst of all is that JavaScript has no shortage of controversy and inflated holy wars.  These are all problems that can be solved provided the language were designed with these problems in mind.
 
-These are all problems that can be solved provided the language were designed with these problems in mind.  Simple Language is designed to be single paradigm with a cleaner syntax.  It will take the best parts of JavaScript and eliminate opportunities for frustration and controversy along the way.
+Simple Language is designed to be single paradigm with a cleaner syntax.  The goal is to provide a language that is easy to learn and teach minimizing frustration, pitfalls, and controversy along the way.
 
 
 
@@ -94,12 +93,21 @@ These are all problems that can be solved provided the language were designed wi
 * `^` exponentiation
 * `%` modulo
 
-### Other operators
+### Arithmetic assignment operators
+* `:+` addition assignment (increment)
+* `:-` subtraction assingment (decrement)
+* `:*` multiplication assignment
+* `:/` division assignment
+* `:^` exponentiation assignment
+* `:%` modulo assignment
+
+### Other reserved characters
 * `!` string concatenation
 * `\` escape sequence
 * `;` statement termination
 * `"` string delimiter
 * `'` string delimiter
+* `.` number decimal separator (only available in number data types)
 
 ### Words: keywords and references
 Words may be comprised of any Unicode character with exception to the following list:
@@ -110,16 +118,17 @@ Words may be comprised of any Unicode character with exception to the following 
 * No characters specified in the syntax section
 * References cannot be named any of the defined keywords or globals
 * None of these specific characters as they are reserved for future use
-   - \` (acent)
+   - \` (grave accent)
    - `@` (at symbol)
    - `$` (dollar)
-   - `.` (period)
 
 
 
 ## Data Types
 ### Definitions
 #### Primitives (passed by value)
+It should be noted that null values exist in this language, but are not a data type. Null can be assigned to a reference, but not within a *let* or *const* function.  The point of null is to unset a value from a reference by instead providing something that is both neutral and useless.  An assignment of null will not cause an error and will not change the reference's *type* property.  Attempting to access or execute any property of a reference with a null value will cause an error.
+
 * string - Strings are delimited by single and double quote characters and store a raw sequence of text characters. Strings may contain any manner of white space and span across multiple lines.
    - "cat"
    - 'dog'
@@ -132,7 +141,6 @@ Words may be comprised of any Unicode character with exception to the following 
    - -123.45678912
 * boolean - true or false
 * regex - JavaScript style regular expressions.
-* null - Null only exists to unset a value from a reference. In expressions null values are coerced to a boolean false value so that they can be positively compared to either null or false without explicit need for a null check.  If a reference needs to be evaluated against literal null check the reference's type to ensure it isn't a boolean.
 
 #### Non-primitives (passed by reference)
 * function - A bag of instructions that accepts parameters for input and always returns a value, where that value is the function itself by default.
@@ -194,7 +202,6 @@ All references have a type and length propery, of which both are read only. The 
 * number - the character length of the value if coerced to a string
 * boolean - the length property always returns 1 for booleans
 * regex - the character length of the value if coerced to a string
-* null - the length property always returns 0 for null
 * function - the string length of the function if coerced to a string
 * array - the number of indexes in the array
 * hash - the number of key/value pairs
@@ -227,22 +234,36 @@ The words in this list cannot be used as names of references
 
 * **argument** - A value passed into a function.  Same as parameter.
 * **break** - Terminates and exits a do/until loop.
-* **const** - A function implicitly available to every block and function for declaration of references that cannot be reassigned to a different value.
+* **const** - A function implicitly available to every block and function for declaration of references where those references cannot be reassigned to a different value.
+* **delete** - A keyword that separates keys from the parent storage object.  The deleted key will be available for garbage collection, as well as any assigned value, and can no longer be accessed.  In the case of arrays all following indexes shift down to fill the missing gap. Attempting to use *delete* on a property defined by this language standard will throw an error.  
 * **do** - A basic loop.  The `do` keyword is required followed by a block followed by the `until` keyword followed by parenthesis group wrapping an expression.
-   - `do myBlock until (x = 5);`
+   - `do myBlock() until (x = 5);`
 * **else** - An alternate block of execution when other branches in a chain of `if` and `elseif` (if present) conditions evaluate to false.
-   -  `if (x > 1) myBlock else otherBlock;`
+   -  `if (x > 1) myBlock() else otherBlock();`
 * **elseif** - An alternate branch in a chain of conditions.  Requires a fully formed `if` statement and 0 or more fully formed `elseif` statements then the `elseif` keyword followed by a parenthesis grouping containing an expression and finally a block to execute.
-   - `if (x > 1) myBlock elseif (x < 0) negativeBlock else otherBlock;`
+   - `if (x > 1) myBlock() elseif (x < 0) negativeBlock() else otherBlock();`
 * **if** - Basic condition.  Requires the keyword `if` followed by a parenthesis grouping containing an expression, which is then followed by a block to execute if the condition evaluates to true.
-   - `if (x > 1) myBlock;`
+   - `if (x > 1) myBlock();`
    - `if (x > 1) {myBoolean: true;}`
-* **let** - A function implicitly available to every block and function for declaration of references that can be reassigned to a different value of the same data type.
-* **null** - A global reserved reference to the null data type.
+* **let** - A function implicitly available to every block and function for declaration of references where those references can be reassigned to a different value of the same data type.
+* **null** - A global reserved reference to a null value.
 * **parameter** - A value passed into a function.  Same as argument.
 * **return** - Terminates and exits a block.  In the case of a function a statement starting with the return keyword is the value returned from the function.
 * **Store** - The global utility allowing data containers and features upon them.
 * **until** - Part of a `do`/`until` loop separating the loop's block from its breaking expression.
+
+
+
+## Store hash methods
+Store is a predefined globally scoped hash provided by the language.  It contains several standard properties.  Any attempt to reassign these standard properties will throw an error.
+
+* **array** - A method for creating a new array type object.
+* **hash** - A method for creating a new hash type object.
+* **length** - A read only number indicating the number of keys assigned to the Store hash.
+* **map** - A method for creating a new map type object.
+* **modifyType** - A method for converting the type property of a reference to a custom value. All *type* properties of references are read only, and so a special reference is required to write a new non-standard value.  This method requires two arguments: a reference or literal of any data type to modify and secondly a string indicating the new type value. 
+* **set** - A method cor creating a new set type object.
+* **type** - A read only string with a value of "hash".
 
 
 
@@ -256,15 +277,19 @@ The words in this list cannot be used as names of references
 
 ## Conditions
 * `if`/`elseif`/`else` - A form of logic branching based upon evaluation of one or more expressions optionally followed by a default.
-   - `if (x > 1) myBlock;`
+   - `if (x > 1) myBlock();`
    - `if (x > 1) {myBoolean: true;}`
-   - `if (x > 1) myBlock elseif (x < 0) negativeBlock else otherBlock;`
-   - `if (x > 1) myBlock else otherBlock;`
+   - `if (x > 1) myBlock() elseif (x < 0) negativeBlock() else otherBlock();`
+   - `if (x > 1) myBlock() else otherBlock();`
 
 
 
 ## Standard methods
 ### Numbers
+* **abs** - Absolute value.
+   - No input is accepted.
+   - Returns a number.
+   - `-1234.5678["abs"](); // returns 1234.5678 //`
 * **ceiling** - Rounds a non-integer to the next higher integer.
    - No input is accepted.
    - Returns a number.
@@ -286,12 +311,12 @@ The words in this list cannot be used as names of references
    - `1234.5678["round"](); // returns 1235 //`
    - `1234.5678["round"](2); // returns 1234.57 //`
    - `1234.5678["round"](6); // returns 1234.5678 //`
-* **toPrecision** - Cuts a number down to the specified number of digits. Similar to the round method, but the final digit isn't rounded.
+* **precision** - Cuts a number down to the specified number of digits. Similar to the round method, but the final digit isn't rounded.
    - Optionally takes a number to determine the number of digits to preserve to the right of the decimal.  If the argument is absent a value of 0 is used to produce an integer. If the supplied number is greater than the number of digits to the right of the decimal the original number is returned.
    - Returns a number.
-   - `1234.5678["toPrecision"](2); // returns 1234.56 //`
-   - `1234.5678["toPrecision"](6); // returns 1234.5678 //`
-   - `1234.5678["toPrecision"](); // returns 1234 //`
+   - `1234.5678["precision"](2); // returns 1234.56 //`
+   - `1234.5678["precision"](6); // returns 1234.5678 //`
+   - `1234.5678["precision"](); // returns 1234 //`
 
 ### Strings
 * **charAt** - Grab a string character at a given index of the string.
@@ -382,6 +407,7 @@ This is an incomplete list of things that will throw an error in this language.
 ### Type errors
 * Reassign a value to a referrence of a different data type
 * Access a property of a referrence with a null value
+* Access a reference or property that doesn't exist
 * Perform arithmetic on non-number data types
 * Attempt to execute any data type as a function/block if they are not functions or blocks.
 * Pass a standard type name into the second argument on the *Store["modifyType"]* method.
@@ -391,3 +417,4 @@ This is an incomplete list of things that will throw an error in this language.
 * Attempt to create a reference with a reserved name from the keywords and global reference list.
 * Access a reference that is not declared in the scope chain
 * Any attempt to overwrite or reassign a standard property of the *Store* hash.
+* Using *delete* on a standard property name.
