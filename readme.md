@@ -1,6 +1,8 @@
 # Simple Language
 An eductional language to speed learning of logic and automation with sacrifice to convention and syntax.
 
+**Status:** Early pre-alpha (experimental)
+
 
 
 ## Todo
@@ -14,7 +16,6 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * consider additional forms of loops
 * consider additional forms of conditions, possibly switch/case (but no fall through)
 * modules
-* define error states
 * document explicit error states
 * Allowing implicit coercion of null to boolean false in expression to eliminate need for some null checks.  This convenience may or may not be a good idea and will need to be revisited in practice.
 * The return keyword will terminate a block.  Investigate if this is a problem where a function contains numerous blocks.
@@ -68,6 +69,8 @@ Simple Language is designed to be single paradigm with a cleaner syntax.  The go
 * `<` less than
 * `>` greater than
 * `<=>` trichotomy // returns -1, 0, or 1 if respectively: less, equal, or greater //
+* `&` logical and
+* `|` logical or
 
 ### Grouping operators
 * `(` logical group start
@@ -76,8 +79,6 @@ Simple Language is designed to be single paradigm with a cleaner syntax.  The go
 * `}` block end
 * `[` array notation start
 * `]` array notation end
-* `&` logical and
-* `|` logical or
 
 ### Assignment/reference operators
 * `:` assignment
@@ -269,7 +270,7 @@ Store is a predefined globally scoped hash provided by the language.  It contain
 
 ## Loops
 * `do`/`until` - A loop that executes repetive logic and breaks only when its `until` expression evaluates to false or when a `break` keyword is executed.
-   - `do myBlock until (x = 5);`
+   - `do myBlock() until (x = 5);`
 * foreach - Arrays, hashes, maps, and sets can be iteracted using the Store's foreach method.  The foreach method traverses every item in the iteration once from beginning to end without deviation or early termination.
    - `Store["foreach"](myArray)`
 
@@ -318,6 +319,16 @@ Store is a predefined globally scoped hash provided by the language.  It contain
    - `1234.5678["precision"](6); // returns 1234.5678 //`
    - `1234.5678["precision"](); // returns 1234 //`
 
+### Storage types (arrays, hashes, maps, and sets)
+* **concat** - Combines a specified store into a target store, but both stores must be of the same data type.
+   - Takes a store as input.
+   - Modifies the target store in place and returns the target store.  If the store type is array the target store will contain all of the specified store's properties added after the target store's original properties in the order provided by myOtherMap.  For other data types keys and properties are overwritten if a key exists in both stores and is otherwise added to the end of the target store.
+   - `myMap["concat"](myOtherMap); // returns myMap will all of myOtherMap's properties //`
+* **forEach** - Traverses every item in the store once from beginning to end without deviation or early termination and executes the item at the given index through a provided function.
+   - Takes a function as input.
+   - Returns the target store.
+   - `mySet["forEach"](functionReference); // returns mySet //`
+
 ### Strings
 * **charAt** - Grab a string character at a given index of the string.
    - Takes a number as input.
@@ -362,6 +373,15 @@ Store is a predefined globally scoped hash provided by the language.  It contain
    - Returns a number.
    - `"1234"["parseNumber"](); // returns 1234 //`
    - `"123a5"["parseNumber"](); // returns 0 //`
+* **replace** - Allows part of a string to be mutated based upon a regular expression match and a substring.
+   - Takes a regular expression and string as input.
+   - Returns a new string.
+   - `"cat is very odd."["replace"](/very/g, "crazy"); // returns "cat is crazy odd." //`
+* **slice** - Returns a fragment of the target string based upon character indexes.
+   - Takes a number as input for starting index, and optionally a second number as ending index.
+   - Returns a new string.
+   - `"my fig tree smells very sweet"["slice"](7); // returns "tree smells very sweet" //`
+   - `"my fig tree smells very sweet"["slice"](7, 11); // returns "tree" //`
 * **split** - Creates an array by dividing a target string on a supplied substring.
    - Takes a string as input.
    - Returns an array.
@@ -417,4 +437,5 @@ This is an incomplete list of things that will throw an error in this language.
 * Attempt to create a reference with a reserved name from the keywords and global reference list.
 * Access a reference that is not declared in the scope chain
 * Any attempt to overwrite or reassign a standard property of the *Store* hash.
+* Any attempt to create a string property onto a data container of names "length" or "type" as these are reserved by the language.
 * Using *delete* on a standard property name.
