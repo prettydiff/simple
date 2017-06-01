@@ -20,6 +20,7 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * Allowing implicit coercion of null to boolean false in expression to eliminate need for some null checks.  This convenience may or may not be a good idea and will need to be revisited in practice.
 * The return keyword will terminate a block.  Investigate if this is a problem where a function contains numerous blocks.
 * a random number method, possibly a global Math object with various methods for things like E, PI, min, max
+* need to set a convention on setting type for function parameters
 
 
 
@@ -79,6 +80,7 @@ Simple Language is designed to be single paradigm with a cleaner syntax.  The go
 * `}` block end
 * `[` array notation start
 * `]` array notation end
+* \` regular expression start and end
 
 ### Assignment/reference operators
 * `:` assignment
@@ -180,7 +182,7 @@ It should be noted that null values exist in this language, but are not a data t
    - Without the following parenthesis the reference to the block itself (the code) is passed without executing the instructions in the block.
    - `animal; // returns the block itself //`
 
-The types array, hash, map, and set are all iterable.  Except for arrays, the contents of these types reside in the order with which they were added.
+The types array, hash, map, and set are all iterable.  Except for arrays, the contents of these types reside in the order with which they were added.  Type checking is ignored for assignments to values in the storage types, so that a value of a different data type can assigned to an existing key.
 
 
 
@@ -272,7 +274,7 @@ Store is a predefined globally scoped hash provided by the language.  It contain
 * `do`/`until` - A loop that executes repetive logic and breaks only when its `until` expression evaluates to false or when a `break` keyword is executed.
    - `do myBlock() until (x = 5);`
 * foreach - Arrays, hashes, maps, and sets can be iteracted using the Store's foreach method.  The foreach method traverses every item in the iteration once from beginning to end without deviation or early termination.
-   - `Store["foreach"](myArray)`
+   - `myStorage["foreach"](functionReference)`
 
 
 
@@ -431,7 +433,7 @@ This is an incomplete list of things that will throw an error in this language.
 * Perform arithmetic on non-number data types
 * Attempt to execute any data type as a function/block if they are not functions or blocks.
 * Pass a standard type name into the second argument on the *Store["modifyType"]* method.
-* Pass the incorrect data type into a method.
+* Pass the incorrect data type into a function.  The data type passeed in must match 
 
 ### Reference errors
 * Attempt to create a reference with a reserved name from the keywords and global reference list.

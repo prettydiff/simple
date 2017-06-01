@@ -51,8 +51,7 @@
             return c[a];
         },
         operator = function sl_operator() {
-            // must solve for regex assignment versus :/ operator
-            if (c[a] === ":" && (next === "+" || next === "-" || next === "*" || next === "^" || next === "%")) {
+            if (c[a] === ":" && (next === "+" || next === "-" || next === "*" || next === "/" || next === "^" || next === "%")) {
                 ltoke === ":" + next;
                 a = a + 1;
                 if (c[a] !== next) {
@@ -85,6 +84,7 @@
             } else {
                 ltoke = c[a];
             }
+            tokenpush();
         },
         generic = function sl_generic(ending) {
             var x = a,
