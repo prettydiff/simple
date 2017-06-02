@@ -1,11 +1,10 @@
 // A small CSV parser rewritten from JavaScript into SL //
-// original JS code at http://prettydiff.com/lib/csvpretty.js //
+/* original JS code at http://prettydiff.com/lib/csvpretty.js */
 
 //TODO//
-//1 - I need to define a module system. "options"" is externally defined and would be included into this file//
-//2 - I need to define a convention for declaring data types on function arguments//
+//1 - I need to define a module system. "options" is externally defined and would be included into this file//
 let(
-    csvpretty: (options) {
+    csvpretty: (options: "hash") {
         let(
             token   : Store["array"],
             tokenize: () {
@@ -23,7 +22,7 @@ let(
                             row["push"](str);
                         }
                     },
-                    parse     : (item, index, arr) {
+                    parse     : (item: "string", index: "number", arr: "array") {
                         let(quoteFalse: {
                             if (
                                 cell["length"] = 0 &

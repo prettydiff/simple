@@ -20,7 +20,6 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * Allowing implicit coercion of null to boolean false in expression to eliminate need for some null checks.  This convenience may or may not be a good idea and will need to be revisited in practice.
 * The return keyword will terminate a block.  Investigate if this is a problem where a function contains numerous blocks.
 * a random number method, possibly a global Math object with various methods for things like E, PI, min, max
-* need to set a convention on setting type for function parameters
 
 
 
@@ -35,7 +34,7 @@ Simple Language is designed to be single paradigm with a cleaner syntax.  The go
 * block scoped and lexical scope natively by default
 * garbage collected
 * no hoisting
-* the only white space are white space characters found in strings and comments
+* the only white space are white space characters found in strings, comments, and regular expressions
 * no inheritance/this/new
 * implicit public/private
 * no try/catch
@@ -60,6 +59,8 @@ Simple Language is designed to be single paradigm with a cleaner syntax.  The go
 ## Comments
 * block comments - `/* */`
 * linear comments - `// //`
+
+Unclosed comments will not generate a parse error.  The unclosed comment will comment until either the terminating sequence is encountered or at end of file.
 
 
 
@@ -182,6 +183,34 @@ It should be noted that null values exist in this language, but are not a data t
    - `animal; // returns the block itself //`
 
 The types array, hash, map, and set are all iterable.  Except for arrays, the contents of these types reside in the order with which they were added.  Type checking is ignored for assignments to values in the storage types, so that a value of a different data type can assigned to an existing key.
+
+### Function Arguments
+The function data type is unique in that this is the only data type that receives input into locally created referrences called *arguments* or *parameters*.  When these arguments are declared they must be assigned to a string value representing a data type.  The absence of this assignment will cause a parse error.  Any value is permitted for this string, including an empty string, to avoid a parse error.  The referrence or value submitted to the function in position of this argument must match the assigned data type or a type error will be thrown.  Here are some examples:
+
+```
+let(myFunction: (source: "string", index: "number") {
+    return;
+});
+myFunction("a big long string", 1234); // good //
+myFunction(12, 1234); // type error, because the first argument expects a value who's type property is value "string" //
+```
+
+```
+let(myFunction: (source: "myCustomType", index: "number") {
+    return;
+});
+myFunction("a big long string", 1234); // type error, //
+// because the first argument will have a type property value of "string", //
+// but a custom subtype is expected with value of "myCustomType" //
+```
+
+```
+let(myFunction: (source, index) {
+    return;
+});
+// parse error, a function is declared with arguments, //
+// but the arguments are not assigned a data type //
+```
 
 
 
@@ -432,7 +461,7 @@ This is an incomplete list of things that will throw an error in this language.
 * Perform arithmetic on non-number data types
 * Attempt to execute any data type as a function/block if they are not functions or blocks.
 * Pass a standard type name into the second argument on the *Store["modifyType"]* method.
-* Pass the incorrect data type into a function.  The data type passeed in must match 
+* Pass the incorrect data type into a function.  The data type passeed in must match the type assigned to the function's argument
 
 ### Reference errors
 * Attempt to create a reference with a reserved name from the keywords and global reference list.
@@ -440,3 +469,13 @@ This is an incomplete list of things that will throw an error in this language.
 * Any attempt to overwrite or reassign a standard property of the *Store* hash.
 * Any attempt to create a string property onto a data container of names "length" or "type" as these are reserved by the language.
 * Using *delete* on a standard property name.
+
+### Parse errors
+* Arguments are declared on a function without assignment to a string.
+* Arithmetic and comparison operators must occur between values or between a parenthesis group of values either by literal numbers or by reference.
+* Using the `?` and not using a `#`, or the opposite, within the same grouping.  A ternary statement requires use of both syntax characters.
+* The `:`, `?`, and `#` characters expect to be followed by a reference, literal value, or a parenthesis grouping.
+* A `do` loop without an `until` keyword.
+* An `until` used without association to a `do` loop.
+* Conditions expect to follow the form: keyword, parenthetical grouping, and block.
+* An unterminated string or regular expression
