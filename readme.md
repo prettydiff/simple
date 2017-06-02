@@ -121,7 +121,6 @@ Words may be comprised of any Unicode character with exception to the following 
 * No characters specified in the syntax section
 * References cannot be named any of the defined keywords or globals
 * None of these specific characters as they are reserved for future use
-   - \` (grave accent)
    - `@` (at symbol)
    - `$` (dollar)
 
