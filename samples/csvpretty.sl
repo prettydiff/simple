@@ -3,8 +3,7 @@
 
 //TODO//
 //1 - I need to define a module system. "options" is externally defined and would be included into this file//
-let(
-    csvpretty: (options: "hash") {
+let(csvpretty: (options: "hash") {
         let(
             token   : Store["array"],
             tokenize: () {

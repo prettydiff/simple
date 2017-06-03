@@ -10,6 +10,7 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * choose a number system that is more precise than IEEE double floating point precision, here are some candidates:
    - DEC64
    - libdfp
+* determine alpha character support in numbers to determine radix and numeric constants
 * write a parser/repl
 * define default methods
 * evaluate chosen number format to determine if words can start with numbers
@@ -57,8 +58,8 @@ Simple Language is designed to be single paradigm with a cleaner syntax.  The go
 
 
 ## Comments
-* block comments - `/* */`
-* linear comments - `// //`
+* star comments - `/* */`
+* slash comments - `// //`
 
 Unclosed comments will not generate a parse error.  The unclosed comment will comment until either the terminating sequence is encountered or at end of file.
 
@@ -472,6 +473,7 @@ This is an incomplete list of things that will throw an error in this language.
 
 ### Parse errors
 * Arguments are declared on a function without assignment to a string.
+* Malformed number.  A number is composed of only one or more numeric digits and a single period. A number may be preceeded by a `+` or `-` character.
 * Arithmetic and comparison operators must occur between values or between a parenthesis group of values either by literal numbers or by reference.
 * Using the `?` and not using a `#`, or the opposite, within the same grouping.  A ternary statement requires use of both syntax characters.
 * The `:`, `?`, and `#` characters expect to be followed by a reference, literal value, or a parenthesis grouping.
