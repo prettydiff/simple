@@ -26,9 +26,12 @@
             },
             esc   = function sl_esc(x) {
                 var y = x;
+                if (c[x - 1] !== "\\") {
+                    return true;
+                }
                 do {
                     y = y - 1;
-                } while (y > -1 && c[y] === "\\");
+                } while (y > -1 && c[y - 1] === "\\");
                 if ((y - x) % 2 === 1) {
                     return true;
                 }
@@ -155,7 +158,7 @@
                 do {
                     output.push(c[x]);
                     if (x > a && c[x] === ending.charAt(0)) {
-                        if (c[x - 1] !== "\\" || (c[x - 1] === "\\" && esc(x) === false)) {
+                        if (c[x - 1] !== "\\" || (c[x - 1] === "\\" && esc(x - 1) === false)) {
                             if (ending.length === 1) {
                                 break;
                             }
@@ -190,23 +193,29 @@
                 var hint = token[[begin[begin.length - 1]] - 1],
                     name = "";
                 if (c[a] === "(") {
-                    if (ltoke === "until") {
-                        name = "until";
+                    if (ltoke === "until" || ltoke === "let" || ltoke === "const") {
+                        name = ltoke;
+                    } else if (ltoke === "if" || ltoke === "elseif" || ltoke === "until") {
+                        name = "condition";
+                    } else if (ltype === "word") {
+                        name = "method";
                     } else {
                         name = "paren";
                     }
                 } else if (c[a] === "[") {
                     name = "property";
-                } else {
-                    if (hint === "if") {
+                } else if (ltoke === ")" && c[a] === "{") {
+                    if (hint === "if" || hint === "elseif") {
                         name = "if";
                     } else if (hint === ":") {
                         name = "function";
                     } else {
                         name = "block";
                     }
+                } else {
+                    name = "block";
                 }
-                deepness.push([a, name]);
+                deepness.push([token.length, name]);
                 ltoke = c[a];
                 ltype = "start";
                 tokenpush();
@@ -245,22 +254,12 @@
             }
             a = a + 1;
         } while (a < b);
-        return (function sl_formatOutput() {
-            var output = [],
-                x = 0,
-                len = token.length;
-            do {
-                output.push([token[x], types[x], depth[x], begin[x]]);
-                x = x + 1;
-            } while (x < len);
-            return output;
-        }());
-        /*return {
+        return {
             token: token,
             types: types,
             depth: depth,
             begin: begin
-        };*/
+        };
     };
     if (typeof module === "object") {
         module.exports = function commonjs_parser(x) {
