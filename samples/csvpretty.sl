@@ -1,9 +1,15 @@
-// A small CSV parser rewritten from JavaScript into SL //
-/* original JS code at http://prettydiff.com/lib/csvpretty.js */
+// A small CSV parser rewritten from //
+// JavaScript into SL //
+
+/*original JS code at */
+/*http://prettydiff.com/lib/csvpretty.js*/
 
 //TODO//
-//1 - I need to define a module system. "options" is externally defined and would be included into this file//
-let(csvpretty: (options: "hash") {
+//1 - I need to define a module system. //
+// "options" is externally defined and //
+// would be included into this file//
+let(
+    csvpretty: (options: "hash") {
         let(
             token   : Store["array"],
             tokenize: () {

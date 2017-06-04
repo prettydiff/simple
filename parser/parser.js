@@ -5,7 +5,7 @@
     var parser = function sl_parser(input) {
         var a = 0,
             c = (typeof input === "string")
-                ? input
+                ? input.split("")
                 : process.argv[2].split(""),
             b = c.length,
             token = [],
@@ -16,12 +16,15 @@
             next  = "",
             ltoke = "",
             ltype = "",
+            ops   = "<>=~&|:?#+-*/^%!",
             line  = 1,
             col   = 0,
             error = false,
             parseError = function sl_parseError(message) {
+                a = a + 1;
                 console.log(message);
                 console.log("Line: " + line + " Character: " + (a - col));
+                console.log(c.slice(col, a).join(""));
                 error = true;
             },
             esc   = function sl_esc(x) {
@@ -31,8 +34,8 @@
                 }
                 do {
                     y = y - 1;
-                } while (y > -1 && c[y - 1] === "\\");
-                if ((y - x) % 2 === 1) {
+                } while (y > -1 && c[y] === "\\");
+                if ((x - y) % 2 === 1) {
                     return true;
                 }
                 return false;
@@ -44,7 +47,8 @@
                 depth.push(deepness[deepness.length - 1][1]);
             },
             white = function sl_white() {
-                var x = a;
+                var x = a,
+                    y = 0;
                 if ((/\s/).test(c[a]) === false) {
                     if ((/\s/).test(c[a + 1]) === false) {
                         next = c[a + 1];
@@ -54,7 +58,7 @@
                         } while ((/\s/).test(c[x]) === true && x < b);
                         next = c[x];
                     }
-                    return c[a];
+                    return x;
                 }
                 do {
                     if (c[a] === "\n" || c[a] === "\r") {
@@ -71,7 +75,7 @@
                     x = x + 1;
                 } while ((/\s/).test(c[x]) === true && x < b);
                 next = c[x];
-                return c[a];
+                return x;
             },
             number = function sl_number() {
                 var output = [],
@@ -83,6 +87,7 @@
                         a = a + 1;
                     } else {
                         parseError("Improper use of arithmetic operator: " + c[a]);
+                        return;
                     }
                 }
                 do {
@@ -154,7 +159,8 @@
             },
             generic = function sl_generic(ending) {
                 var x = a,
-                    output = [];
+                    output = [],
+                    reg    = "gmiuy";
                 do {
                     output.push(c[x]);
                     if (x > a && c[x] === ending.charAt(0)) {
@@ -172,6 +178,25 @@
                     x = x + 1;
                 } while (x < b);
                 a = x;
+                white();
+                if (ltype === "regex" && reg.indexOf(next) > -1) {
+                    a = a + 1;
+                    do {
+                        if (ops.indexOf(c[a]) > -1 || c[a] === "," || c[a] === ";" || c[a] === "[") {
+                            break;
+                        }
+                        if ((/\s/).test(c[a]) === false) {
+                            if (reg.indexOf(c[a]) < 0) {
+                                parseError("Extraneous characters following a regular expression: " + c[a]);
+                                return;
+                            }
+                            output.push(c[a]);
+                            reg = reg.replace(c[a], "");
+                        }
+                        a = a + 1;
+                    } while (a < b && reg !== "");
+                    a = a - 1;
+                }
                 ltoke = output.join("");
                 tokenpush();
             },
@@ -228,16 +253,22 @@
             };
         do {
             if (error === true) {
-                return;
+                return {};
             }
-            white(false);
+            white();
+            if (a === b) {
+                break;
+            }
             if (c[a] === "\"" || c[a] === "'") {
                 ltype = "string";
                 generic(c[a]);
             } else if (c[a] === "/" && (next === "*" || next === "/")) {
                 ltype = "comment";
                 generic(next + "/");
-            } else if ("<>=~&|:?#+-*/^%!".indexOf(c[a]) > -1) {
+            } else if (c[a] === "`") {
+                ltype = "regex";
+                generic("`");
+            } else if (ops.indexOf(c[a]) > -1) {
                 operator();
             } else if (c[a] === "," || c[a] === ";") {
                 ltype = "separator";

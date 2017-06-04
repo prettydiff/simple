@@ -22,6 +22,9 @@
         }
         output = parser(filedata);
         keys = Object.keys(output);
+        if (keys.length < 1) {
+            return;
+        }
         len = output[keys[0]].length;
         c = keys.length;
         do {
@@ -48,7 +51,13 @@
         do {
             b = 0;
             do {
-                d = formatted[a][b].length + (formatted[a][b].split("\\").length - 1);
+                d = formatted[a][b].length;
+                if (b < 1) {
+                    d = d +
+                        (formatted[a][b].split("\\").length - 1) -
+                        (formatted[a][b].split("\\n").length - 1) - 
+                        (formatted[a][b].split("\\r").length - 1);
+                }
                 if (d < longest[b]) {
                     do {
                         formatted[a][b] = formatted[a][b] + " ";
@@ -57,8 +66,8 @@
                 }
                 b = b + 1;
             } while (b < c);
+            console.log(formatted[a].join(" "));
             a = a + 1;
         } while (a < len);
-        console.log(formatted);
     });
 }());
