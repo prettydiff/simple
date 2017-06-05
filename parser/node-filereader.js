@@ -54,13 +54,15 @@
                 d = formatted[a][b].length;
                 if (b < 1) {
                     d = d +
-                        (formatted[a][b].split("\\").length - 1) -
-                        (formatted[a][b].split("\\n").length - 1) - 
-                        (formatted[a][b].split("\\r").length - 1);
+                        (formatted[a][b].split("\\(?!(\w))").length - 1);
                 }
                 if (d < longest[b]) {
                     do {
-                        formatted[a][b] = formatted[a][b] + " ";
+                        if (b < c - 1) {
+                            formatted[a][b] = formatted[a][b] + " ";
+                        } else {
+                            formatted[a][b] = " " + formatted[a][b];
+                        }
                         d = d + 1;
                     } while (d < longest[b]);
                 }

@@ -47,10 +47,12 @@ Simple Language is designed to be single paradigm with a cleaner syntax.  The go
 
 
 ## Definition of terms
+* **argument** - A value passed into a function.  Same as parameter.
 * **block** - A block is a bag of instructions. Blocks always begin with an opening curly brace and end with a closing curly brace.  Blocks provide scope and references may be declared in any block.
 * **expression** - An expression is a bit of code that asks the computer for an opinion, called evaluation.  This could be as simple as comparing one number to another number or checking the length of a string.  Expressions are wrapped in parentheses.
 * **method** - A function accessed as the property of a reference.
 * **object** - A generic term for any non-primitive data type.
+* **parameter** - A value passed into a function.  Same as argument.
 * **property** - A subreferrence accessed through a reference.  Properties are always accessed with square braces.
 * **reference** - A named assigned to a primitive or object.
 * **statement** - A statement is an action.  It can be as primitive as simply calling a reference, or it can provide a multitude of instructions.  Statements are terminated with semicolons.
@@ -264,7 +266,6 @@ if (y = 3) {
 ## Keywords and globals
 The words in this list cannot be used as names of references
 
-* **argument** - A value passed into a function.  Same as parameter.
 * **break** - Terminates and exits a do/until loop.
 * **const** - A function implicitly available to every block and function for declaration of references where those references cannot be reassigned to a different value.
 * **delete** - A keyword that separates keys from the parent storage object.  The deleted key will be available for garbage collection, as well as any assigned value, and can no longer be accessed.  In the case of arrays all following indexes shift down to fill the missing gap. Attempting to use *delete* on a property defined by this language standard will throw an error.  
@@ -279,7 +280,6 @@ The words in this list cannot be used as names of references
    - `if (x > 1) {myBoolean: true;}`
 * **let** - A function implicitly available to every block and function for declaration of references where those references can be reassigned to a different value of the same data type.
 * **null** - A global reserved reference to a null value.
-* **parameter** - A value passed into a function.  Same as argument.
 * **return** - Terminates and exits a block.  In the case of a function a statement starting with the return keyword is the value returned from the function.
 * **Store** - The global utility allowing data containers and features upon them.
 * **until** - Part of a `do`/`until` loop separating the loop's block from its breaking expression.

@@ -19,6 +19,7 @@
             ops   = "<>=~&|:?#+-*/^%!",
             line  = 1,
             col   = 0,
+            reserved = ["break", "const", "delete", "do", "else", "elseif", "if", "let", "null", "return", "Store", "until"],
             error = false,
             parseError = function sl_parseError(message) {
                 a = a + 1;
@@ -93,6 +94,12 @@
                 do {
                     if ((/\s/).test(c[a]) === false) {
                         output.push(c[a]);
+                    } else if (c[a] === "\r" || c[a] === "\n") {
+                        line = line + 1;
+                        col  = a;
+                        if (c[a] === "\r" && c[a] === "\n") {
+                            a = a + 1;
+                        }
                     }
                     if (c[a] === ".") {
                         if (period === true) {
@@ -113,7 +120,9 @@
                 tokenpush();
             },
             operator = function sl_operator() {
-                var extranext = "";
+                var extranext = "",
+                    cline = line,
+                    ccol  = col;
                 if (c[a] === ":" && (next === "+" || next === "-" || next === "*" || next === "/" || next === "^" || next === "%")) {
                     ltoke = ":" + next;
                     a = a + 1;
@@ -130,6 +139,13 @@
                         var x = a + 1;
                         if ((/\s/).test(c[x]) === true) {
                             do {
+                                if (c[x] === "\r" || c[x] === "\n") {
+                                    cline = cline + 1;
+                                    ccol  = x;
+                                    if (c[x] === "\r" && c[x] === "\n") {
+                                        x = x + 1;
+                                    }
+                                }
                                 x = x + 1; 
                             } while (x < b && (/\s/).test(c[x]) === true);
                         }
@@ -138,12 +154,21 @@
                         }
                         x = x + 1;
                         if ((/\s/).test(c[x]) === true) {
+                            if (c[x] === "\r" || c[x] === "\n") {
+                                cline = cline + 1;
+                                ccol  = x;
+                                if (c[x] === "\r" && c[x] === "\n") {
+                                    x = x + 1;
+                                }
+                            }
                             do {
                                 x = x + 1; 
                             } while (x < b && (/\s/).test(c[x]) === true);
                         }
                         if (c[x] === ">") {
                             a = x;
+                            line = cline;
+                            col  = ccol;
                             return "<=>";
                         }
                         return "<";
@@ -153,6 +178,13 @@
                         return number();
                     }
                     ltoke = c[a];
+                }
+                if (ltoke === ":" && types[types.length - 1] === "word") {
+                    extranext = token[token.length - 1];
+                    if (reserved.indexOf(extranext) > -1) {
+                        parseError("Reference error, use of a reserved word: " + extranext);
+                        return;
+                    }
                 }
                 ltype = "operator";
                 tokenpush();
@@ -192,6 +224,12 @@
                             }
                             output.push(c[a]);
                             reg = reg.replace(c[a], "");
+                        } else if (c[a] === "\r" || c[a] === "\n") {
+                            line = line + 1;
+                            col  = a;
+                            if (c[a] === "\r" && c[a] === "\n") {
+                                a = a + 1;
+                            }
                         }
                         a = a + 1;
                     } while (a < b && reg !== "");
@@ -202,15 +240,47 @@
             },
             word  = function sl_word() {
                 var output = [],
-                    chars  = "=~!@#$%^&*()-+,.<>|{}[]:;`?/\"'";
+                    chars  = "=~!@#$%^&*()-+,.<>|{}[]:;`?/\"'",
+                    x      = 0;
                 do {
                     if ((/\s/).test(c[a]) === false) {
                         output.push(c[a]);
+                    } else if (c[a] === "\r" || c[a] === "\n") {
+                        line = line + 1;
+                        col  = a;
+                        if (c[a] === "\r" && c[a] === "\n") {
+                            a = a + 1;
+                        }
                     }
                     a = a + 1;
                 } while (a < b && chars.indexOf(c[a]) < 0);
                 a = a - 1;
                 ltoke = output.join("");
+                if (ltoke === "let" || ltoke === "const") {
+                    x = token.length - 1;
+                    if (token[x] !== "{") {
+                        if (x > -1 && depth[x] === "global") {
+                            do {
+                                if (types[x] !== "comment") {
+                                    parseError("Parse error, let and const are only allowed once at the top of blocks or once in the global scope.");
+                                    return;
+                                }
+                                x = x - 1;
+                            } while (x > -1);
+                        } else {
+                            if (token[x] !== ";" && token[x - 1] !== ")") {
+                                parseError("Parse error, let and const are only allowed once at the top of blocks or once in the global scope.");
+                                return;
+                            }
+                            if (token[x] === ";") {
+                                if ((ltoke === "let" && depth[x - 1] !== "const") || (ltoke === "const" && depth[x - 1] !== "let")) {
+                                    parseError("Parse error, let and const are only allowed once at the top of blocks or once in the global scope.");
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
                 ltype = "word";
                 tokenpush();
             },
