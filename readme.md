@@ -19,7 +19,7 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * modules
 * document explicit error states
 * Allowing implicit coercion of null to boolean false in expression to eliminate need for some null checks.  This convenience may or may not be a good idea and will need to be revisited in practice.
-* The return keyword will terminate a block.  Investigate if this is a problem where a function contains numerous blocks.
+* The return function will terminate a block.  Investigate if this is a problem where a function contains numerous blocks.
 * a random number method, possibly a global Math object with various methods for things like E, PI, min, max
 
 
@@ -149,13 +149,15 @@ It should be noted that null values exist in this language, but are not a data t
 * regex - JavaScript style regular expressions.
 
 #### Non-primitives (passed by reference)
-* function - A bag of instructions that accepts parameters for input and always returns a value, where that value is the function itself by default.
+* function - A bag of instructions that accepts parameters for input and always returns a value, where that value is the function itself by default if the return function isn't specified.
    - Declared by applying a parenthsis grouping prior to a block.
    - `cat: () {console.log("meow");}`
    - Executed when a parethesis grouping follows the function's reference.
    - `cat(); // returns the actual function because a return value isn't specific and executes its instructions //`
    - Without the following parenthesis the reference to the function itself is passed without executing the function.
    - `cat; // returns the actual function without executing its instructions //`
+   - Provide the return function to specify output for the function.
+   - `cat: (x:"number") {return(x + 1)}; cat(3); // returns 4`
 * array - A list of dynamic length where keys are 0 based incrementing integers and values are of any data type. Every index must have a value.  Sparse arrays will throw an error.
    - Declared by use of the global Store hash's array property.
    - `animals: Store.array("cat", "dog", "parrot")`
@@ -280,7 +282,8 @@ The words in this list cannot be used as names of references
    - `if (x > 1) {myBoolean: true;}`
 * **let** - A function implicitly available to every block and function for declaration of references where those references can be reassigned to a different value of the same data type.
 * **null** - A global reserved reference to a null value.
-* **return** - Terminates and exits a block.  In the case of a function a statement starting with the return keyword is the value returned from the function.
+* **return** - A function that terminates and exits a block.  In the case where the block is a function a single value or any type may be passed into the return function, which is the function's returned value.  For blocks that aren't functions the value passed into the return function is ignored.
+   - `return(myValue);`
 * **Store** - The global utility allowing data containers and features upon them.
 * **until** - Part of a `do`/`until` loop separating the loop's block from its breaking expression.
 
