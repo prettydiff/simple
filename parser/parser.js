@@ -1,12 +1,10 @@
 /* The first attempt at a parser will be in JavaScript with Node, a platform familiar to me. */
-/*jslint node:true*/
+/*global console, module*/
 (function sl() {
     "use strict";
     var parser = function sl_parser(input) {
         var a = 0,
-            c = (typeof input === "string")
-                ? input.split("")
-                : process.argv[2].split(""),
+            c = input.split(""),
             b = c.length,
             token = [],
             types = [],
@@ -22,10 +20,24 @@
             reserved = ["break", "const", "delete", "do", "else", "elseif", "if", "let", "null", "return", "Store", "until"],
             error = false,
             parseError = function sl_parseError(message) {
+                var eline = [],
+                    x     = a + 1;
+                if (x < b) {
+                    do {
+                        x = x + 1;
+                    } while (x < b && c[x] !== "\r" && c[x] !== "\n");
+                }
                 a = a + 1;
                 console.log(message);
                 console.log("Line: " + line + " Character: " + (a - col));
-                console.log(c.slice(col, a).join(""));
+                console.log(c.slice(col, x).join(""));
+                x = a - col;
+                do {
+                    eline.push("-");
+                    x = x - 1;
+                } while (x > 0);
+                eline.push("^");
+                console.log(eline.join(""));
                 error = true;
             },
             esc   = function sl_esc(x) {
@@ -48,8 +60,7 @@
                 depth.push(deepness[deepness.length - 1][1]);
             },
             white = function sl_white() {
-                var x = a,
-                    y = 0;
+                var x = a;
                 if ((/\s/).test(c[a]) === false) {
                     if ((/\s/).test(c[a + 1]) === false) {
                         next = c[a + 1];
@@ -258,28 +269,31 @@
                 ltoke = output.join("");
                 if (ltoke === "let" || ltoke === "const") {
                     x = token.length - 1;
-                    if (token[x] !== "{") {
-                        if (x > -1 && depth[x] === "global") {
-                            do {
-                                if (types[x] !== "comment") {
-                                    parseError("Parse error, let and const are only allowed once at the top of blocks or once in the global scope.");
-                                    return;
-                                }
-                                x = x - 1;
-                            } while (x > -1);
-                        } else {
-                            if (token[x] !== ";" && token[x - 1] !== ")") {
+                    if (types[x] === "comment") {
+                        do {
+                            x = x - 1;
+                        } while (x > -1 && types[x] === "comment");
+                    }
+                    if (x > -1 && (depth[x] === "global" || token[x] !== "{")) {
+                        if (token[x] !== ";" && token[x - 1] !== ")") {
+                            parseError("Parse error, let and const are only allowed once at the top of blocks or once in the global scope.");
+                            return;
+                        }
+                        if (token[x] === ";") {
+                            if ((ltoke === "let" && depth[x - 1] !== "const") || (ltoke === "const" && depth[x - 1] !== "let")) {
                                 parseError("Parse error, let and const are only allowed once at the top of blocks or once in the global scope.");
                                 return;
                             }
-                            if (token[x] === ";") {
-                                if ((ltoke === "let" && depth[x - 1] !== "const") || (ltoke === "const" && depth[x - 1] !== "let")) {
-                                    parseError("Parse error, let and const are only allowed once at the top of blocks or once in the global scope.");
-                                    return;
-                                }
-                            }
                         }
                     }
+                }
+                if (ltoke === "until" && token[token.length - 1] !== "}" && depth[depth.length - 1] !== "do") {
+                    parseError("Parse error, keyword 'until' not following a 'do' block.");
+                    return;
+                }
+                if (ltoke !== "until" && token[token.length - 1] === "}" && depth[depth.length - 1] === "do") {
+                    parseError("Parse error, 'do' block not followed by word 'until'.");
+                    return;
                 }
                 ltype = "word";
                 tokenpush();
@@ -308,7 +322,11 @@
                         name = "block";
                     }
                 } else {
-                    name = "block";
+                    if (ltoke === "do") {
+                        name = "do";
+                    } else {
+                        name = "block";
+                    }
                 }
                 deepness.push([token.length, name]);
                 ltoke = c[a];
@@ -318,6 +336,16 @@
             end   = function sl_end() {
                 ltoke = c[a];
                 ltype = "end";
+                if (ltoke === "}") {
+                    if (token[deepness[deepness.length - 1][0]] !== "{") {
+                        parseError("Parse error, ending character '" + ltoke + "' doesn't match start character '" + token[deepness[deepness.length - 1][0]] + "'.");
+                        return;
+                    }
+                    if (deepness[deepness.length - 1][1] === "do" && next !== "u") {
+                        parseError("Parse error, 'do' block does not appear to be followed by keyword 'until'.");
+                        return;
+                    }
+                }
                 tokenpush();
                 deepness.pop();
             };
