@@ -97,7 +97,7 @@ let(
                 ["replace"](`\r\n`g, "\n")
                 ["replace"](`\r`g, "\n");
         tokenize();
-        return token;
+        return(token);
     }
 );
 csvpretty(options);

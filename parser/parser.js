@@ -104,7 +104,21 @@
                 }
                 do {
                     if ((/\s/).test(c[a]) === false) {
+                        if (chars.indexOf(c[a]) < 0) {
+                            break;
+                        }
                         output.push(c[a]);
+                        if (c[a] === ".") {
+                            if (period === true) {
+                                parseError("Malformed number, extra period: " + c[a]);
+                                return;
+                            }
+                            period = true;
+                        }
+                        if (c[a] === "+" || c[a] === "-") {
+                            parseError("Improper use of arithmetic operator: " + c[a]);
+                            return;
+                        }
                     } else if (c[a] === "\r" || c[a] === "\n") {
                         line = line + 1;
                         col  = a;
@@ -112,19 +126,8 @@
                             a = a + 1;
                         }
                     }
-                    if (c[a] === ".") {
-                        if (period === true) {
-                            parseError("Malformed number, extra period: " + c[a]);
-                            return;
-                        }
-                        period = true;
-                    }
-                    if (c[a] === "+" || c[a] === "-") {
-                        parseError("Improper use of arithmetic operator: " + c[a]);
-                        return;
-                    }
                     a = a + 1;
-                } while (a < b && chars.indexOf(c[a]) > -1);
+                } while (a < b);
                 a = a - 1;
                 ltoke = output.join("");
                 ltype = "number";
