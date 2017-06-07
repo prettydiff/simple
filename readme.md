@@ -6,20 +6,25 @@ An eductional language to speed learning of logic and automation with sacrifice 
 
 
 ## Todo
-* investigate Set containers
+### Priorities
+* module system
+   - import(list of refs) from "URI";
+   - include("URI");
+   - export
+* interpreter/repl
 * choose a number system that is more precise than IEEE double floating point precision, here are some candidates:
    - DEC64
    - libdfp
-* determine alpha character support in numbers to determine radix and numeric constants
-* write a parser/repl
-* define default methods
+
+### Concerns
+* investigate Set containers: access, iteration, use cases
 * evaluate chosen number format to determine if words can start with numbers
-* consider additional forms of loops
-* consider additional forms of conditions, possibly switch/case (but no fall through)
-* modules
-* document explicit error states
-* Allowing implicit coercion of null to boolean false in expression to eliminate need for some null checks.  This convenience may or may not be a good idea and will need to be revisited in practice.
 * The return function will terminate a block.  Investigate if this is a problem where a function contains numerous blocks.
+
+### Tasks
+* document explicit error states
+* determine alpha character support in numbers to determine radix and numeric constants
+* define default methods
 * a random number method, possibly a global Math object with various methods for things like E, PI, min, max
 
 
@@ -194,7 +199,7 @@ The function data type is unique in that this is the only data type that receive
 
 ```
 let(myFunction: (source: "string", index: "number") {
-    return;
+    return();
 });
 myFunction("a big long string", 1234); // good //
 myFunction(12, 1234); // type error, because the first argument expects a value who's type property is value "string" //
@@ -202,7 +207,7 @@ myFunction(12, 1234); // type error, because the first argument expects a value 
 
 ```
 let(myFunction: (source: "myCustomType", index: "number") {
-    return;
+    return();
 });
 myFunction("a big long string", 1234); // type error, //
 // because the first argument will have a type property value of "string", //
@@ -211,7 +216,7 @@ myFunction("a big long string", 1234); // type error, //
 
 ```
 let(myFunction: (source, index) {
-    return;
+    return();
 });
 // parse error, a function is declared with arguments, //
 // but the arguments are not assigned a data type //

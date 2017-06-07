@@ -136,8 +136,9 @@
             operator = function sl_operator() {
                 var extranext = "",
                     cline = line,
-                    ccol  = col;
-                if (c[a] === ":" && (next === "+" || next === "-" || next === "*" || next === "/" || next === "^" || next === "%")) {
+                    ccol  = col,
+                    d     = token.length - 1;
+                if (c[a] === ":" && depth[d] !== "let" && depth[d] !== "const" && (next === "+" || next === "-" || next === "*" || next === "/" || next === "^" || next === "%")) {
                     ltoke = ":" + next;
                     a = a + 1;
                     extranext = a;
@@ -188,17 +189,14 @@
                         return "<";
                     }());
                 } else {
-                    if ((c[a] === "+" || c[a] === "-") && ".0123456789".indexOf(next) > -1) {
+                    if (types[d] !== "reference" && (c[a] === "+" || c[a] === "-") && ".0123456789".indexOf(next) > -1 && ((depth[d] !== "let" && depth[d] !== "const") || ltoke === ":")) {
                         return number();
                     }
                     ltoke = c[a];
                 }
-                if (ltoke === ":" && types[types.length - 1] === "word") {
-                    extranext = token[token.length - 1];
-                    if (reserved.indexOf(extranext) > -1) {
-                        parseError("Reference error, use of a reserved word: " + extranext);
-                        return;
-                    }
+                if (ltoke === ":" && types[d] === "keyword") {
+                    parseError("Reference error, use of a reserved word: " + token[d]);
+                    return;
                 }
                 ltype = "operator";
                 tokenpush();
@@ -298,7 +296,11 @@
                     parseError("Parse error, 'do' block not followed by word 'until'.");
                     return;
                 }
-                ltype = "word";
+                if (reserved.indexOf(ltoke) > -1) {
+                    ltype = "keyword";
+                } else {
+                    ltype = "reference";
+                }
                 tokenpush();
             },
             start = function sl_start() {
@@ -309,7 +311,7 @@
                         name = ltoke;
                     } else if (ltoke === "if" || ltoke === "elseif" || ltoke === "until") {
                         name = "condition";
-                    } else if (ltype === "word") {
+                    } else if (ltype === "keyword" || ltype === "reference") {
                         name = "method";
                     } else {
                         name = "paren";
