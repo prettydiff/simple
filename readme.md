@@ -434,29 +434,24 @@ Store is a predefined globally scoped hash provided by the language.  It contain
 
 
 ## Custom Data Types
-Simple Language provideds a method *modifyType* on the Store hash for creating custom data types.  This method has special access to write a custom value to the read only *type* property on a reference.  This method takes two arguments: a reference to modify and a string for the new type value.  Any string is allowed except for the names of the standard types.  This means that once a reference is converted to a custom type it cannot be reverted back to a standard type.
+Simple Language provideds a method *modifyType* on the Store hash for creating custom data types.  This method has special access to write a custom value to the read only *type* property on a reference.  This method takes two arguments: a function and a string for the new type name.  Any string is allowed except for the names of the existing types whether they are standard types or custom types.  The return value of the function, in the first argument, is the base model for the new type.  The new type value will be available as a property of the global Store hash.
+```
+Store["modifyType"]((){
+    let(myFunction: (sample: "string") {
+        return sample.slice(0, 3);
+    });
+    return myFunction;
+}, "short string factory");
+```
 
-Perhaps the most direct means is to define a function that creates a reference from a base type, extends that reference in a uniform way, and returns this reference.  Here is an example of creating a type named *shortString*:
+To declare a reference as a custom type simply assign it to the custom type name as a property of the Store object:
 ```
 let(
-    shortString: (value) {
-        Store["modifyType"](value, "shortString");
-        return value["slice"](0, 3);
-    },
-    myTinyString: shortString("abracadabra")
+    reference: Store["my Custom Type"]
 );
 ```
 
-The function that creates a custom type may be created anywhere, such as the local function created in the example above.  Sometimes a standard location is preferred for cleaner organization of code.  In this case it could be wise to store this capability in the global Store hash as in this example:
-```
-Store["shortString"]: (value) {
-    Store["modifyType"](value, "shortString");
-    return value["slice"](0, 3);
-};
-let(
-    myTinyString: Store["shortString"]("abracadabra")
-);
-```
+Type creation may occur at any level of the scope chain, but remains lexically bound to the scope where it is created like any reference.  This means a custom type declared in a child block will not be available to the parent block, but it will be available to all child and descendant scopes.
 
 
 

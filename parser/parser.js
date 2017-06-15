@@ -10,6 +10,9 @@
             types = [],
             depth = [],
             begin = [],
+            dtype = [],
+            lengt = [],
+            scope = [],
             deepness = [[0, "global"]],
             next  = "",
             ltoke = "",
@@ -17,27 +20,39 @@
             ops   = "<>=~&|:?#+-*/^%!",
             line  = 1,
             col   = 0,
-            reserved = ["break", "const", "delete", "do", "else", "elseif", "if", "let", "null", "return", "Store", "until"],
+            unterm = [0, 0],
+            reserved = ["break", "const", "delete", "do", "else", "elseif", "false", "if", "let", "null", "return", "Store", "true", "until"],
             error = false,
             parseError = function sl_parseError(message) {
                 var eline = [],
-                    x     = a + 1;
+                    x     = a + 1,
+                    code  = "",
+                    count = "";
                 if (x < b) {
                     do {
                         x = x + 1;
                     } while (x < b && c[x] !== "\r" && c[x] !== "\n");
                 }
                 a = a + 1;
+                console.log("");
                 console.log(message);
-                console.log("Line: " + line + " Character: " + (a - col));
-                console.log(c.slice(col, x).join(""));
+                code = c.slice(col, x).join("");
+                code = code.replace(/\r/g, "\n").replace(/^(\n+)/, "").split("\n")[0];
+                console.log(code);
                 x = a - col;
+                if (x > code.length) {
+                    x = code.length;
+                    count = "Line: " + line + " Character: " + x;
+                } else {
+                    count = "Line: " + line + " Character: " + (a - col);
+                }
                 do {
                     eline.push("-");
                     x = x - 1;
                 } while (x > 0);
                 eline.push("^");
                 console.log(eline.join(""));
+                console.log(count);
                 error = true;
             },
             esc   = function sl_esc(x) {
@@ -54,6 +69,12 @@
                 return false;
             },
             tokenpush = function sl_tokenpush() {
+                if (ltype === "reference") {
+                    if 
+                } else {
+                    dtype.push("");
+                    lengt.push(0);
+                }
                 token.push(ltoke);
                 types.push(ltype);
                 begin.push(deepness[deepness.length - 1][0]);
@@ -98,8 +119,7 @@
                         output.push(c[a]);
                         a = a + 1;
                     } else {
-                        parseError("Improper use of arithmetic operator: " + c[a]);
-                        return;
+                        return parseError("Improper use of arithmetic operator: " + c[a]);
                     }
                 }
                 do {
@@ -110,14 +130,12 @@
                         output.push(c[a]);
                         if (c[a] === ".") {
                             if (period === true) {
-                                parseError("Malformed number, extra period: " + c[a]);
-                                return;
+                                return parseError("Malformed number, extra period: " + c[a]);
                             }
                             period = true;
                         }
                         if (c[a] === "+" || c[a] === "-") {
-                            parseError("Improper use of arithmetic operator: " + c[a]);
-                            return;
+                            return parseError("Improper use of arithmetic operator: " + c[a]);
                         }
                     } else if (c[a] === "\r" || c[a] === "\n") {
                         line = line + 1;
@@ -194,9 +212,10 @@
                     }
                     ltoke = c[a];
                 }
-                if (ltoke === ":" && types[d] === "keyword") {
-                    parseError("Reference error, use of a reserved word: " + token[d]);
-                    return;
+                if (ltoke === ":") {
+                    if (types[d] === "keyword") {
+                        return parseError("Reference error, use of a reserved word: " + token[d]);
+                    }
                 }
                 ltype = "operator";
                 tokenpush();
@@ -204,7 +223,8 @@
             generic = function sl_generic(ending) {
                 var x = a,
                     output = [],
-                    reg    = "gmiuy";
+                    reg    = "gmiuy",
+                    sline  = line;
                 do {
                     output.push(c[x]);
                     if (x > a && c[x] === ending.charAt(0)) {
@@ -219,8 +239,29 @@
                             }
                         }
                     }
+                    if (c[x] === "\r" || c[x] === "\n") {
+                        if (unterm[0] === 0 && c.slice(col, x).join("").split(ending).length > 2) {
+                            unterm = [col, line];
+                        }
+                        line = line + 1;
+                        col  = x;
+                        if (c[x] === "\r" && c[x + 1] === "\n") {
+                            x = x + 1;
+                        }
+                    }
                     x = x + 1;
                 } while (x < b);
+                if (x === b) {
+                    line = sline;
+                    col  = a;
+                    parseError("Unterminated " + ltype + ".");
+                    if (unterm[0] > 0) {
+                        line = unterm[1];
+                        col  = unterm[0];
+                        parseError("Problem could originate from line: " + unterm[1]);
+                    }
+                    return;
+                }
                 a = x;
                 white();
                 if (ltype === "regex" && reg.indexOf(next) > -1) {
@@ -277,35 +318,59 @@
                     }
                     if (x > -1 && (depth[x] === "global" || token[x] !== "{")) {
                         if (token[x] !== ";" && token[x - 1] !== ")") {
-                            parseError("Parse error, let and const are only allowed once at the top of blocks or once in the global scope.");
-                            return;
+                            return parseError("Parse error, let and const are only allowed once at the top of blocks or once in the global scope.");
                         }
                         if (token[x] === ";") {
                             if ((ltoke === "let" && depth[x - 1] !== "const") || (ltoke === "const" && depth[x - 1] !== "let")) {
-                                parseError("Parse error, let and const are only allowed once at the top of blocks or once in the global scope.");
-                                return;
+                                return parseError("Parse error, let and const are only allowed once at the top of blocks or once in the global scope.");
                             }
                         }
                     }
                 }
                 if (ltoke === "until" && token[token.length - 1] !== "}" && depth[depth.length - 1] !== "do") {
-                    parseError("Parse error, keyword 'until' not following a 'do' block.");
-                    return;
+                    return parseError("Parse error, keyword 'until' not following a 'do' block.");
                 }
                 if (ltoke !== "until" && token[token.length - 1] === "}" && depth[depth.length - 1] === "do") {
-                    parseError("Parse error, 'do' block not followed by word 'until'.");
-                    return;
+                    return parseError("Parse error, 'do' block not followed by word 'until'.");
                 }
                 if (reserved.indexOf(ltoke) > -1) {
-                    ltype = "keyword";
+                    if (ltoke === "true" || ltoke === "false") {
+                        ltype = "boolean";
+                    } else {
+                        ltype = "keyword";
+                    }
                 } else {
                     ltype = "reference";
                 }
                 tokenpush();
+                /*x = token.length - 1;
+                if (token[begin[x]] === "(" && token[begin[x] - 1] === ":") {
+                    if (token[x - 1] !== "," && x > begin[x] + 1) {
+                        a = a - 1;
+                        return parseError("Parse error, either a single reference or comma separated references as declarations of function arguments, but instead saw: " + token[x - 1]);
+                    }
+                    if (ltype === "keyword") {
+                        return parseError("Parse error, expected a reference assignment to a string in function argument position but instead saw a reserved word " + token[x]);
+                    }
+                    white();
+                    if (next !== ":") {
+                        a = a - 1;
+                        return parseError("Parse error, expected an assignment to a string for function arguments but instead saw: " + next);
+                    }
+                    ltoke = ":";
+                    ltype = "operator";
+                    a = a + 1;
+                    tokenpush();
+                    white();
+                    if (next !== "\"" && next !== "'") {
+                        a = a - 1;
+                        return parseError("Parse error, expected an assignment to a string for function arguments but instead saw: " + next);
+                    }
+                }*/
             },
             start = function sl_start() {
-                var hint = token[[begin[begin.length - 1]] - 1],
-                    name = "";
+                var hint  = token[[begin[begin.length - 1]] - 1],
+                    name  = "";
                 if (c[a] === "(") {
                     if (ltoke === "until" || ltoke === "let" || ltoke === "const") {
                         name = ltoke;
@@ -343,12 +408,10 @@
                 ltype = "end";
                 if (ltoke === "}") {
                     if (token[deepness[deepness.length - 1][0]] !== "{") {
-                        parseError("Parse error, ending character '" + ltoke + "' doesn't match start character '" + token[deepness[deepness.length - 1][0]] + "'.");
-                        return;
+                        return parseError("Parse error, ending character '" + ltoke + "' doesn't match start character '" + token[deepness[deepness.length - 1][0]] + "'.");
                     }
                     if (deepness[deepness.length - 1][1] === "do" && next !== "u") {
-                        parseError("Parse error, 'do' block does not appear to be followed by keyword 'until'.");
-                        return;
+                        return parseError("Parse error, 'do' block does not appear to be followed by keyword 'until'.");
                     }
                 }
                 tokenpush();
