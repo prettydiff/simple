@@ -6,13 +6,15 @@
         var a = 0,
             c = input.split(""),
             b = c.length,
-            token = [],
+            token = [], 
             types = [],
             depth = [],
             begin = [],
-            dtype = [],
             lengt = [],
+            chain = [],
+            claim = [],
             scope = [],
+            scopes = [],
             deepness = [[0, "global"]],
             next  = "",
             ltoke = "",
@@ -20,6 +22,7 @@
             ops   = "<>=~&|:?#+-*/^%!",
             line  = 1,
             col   = 0,
+            len   = -1,
             unterm = [0, 0],
             reserved = ["break", "const", "delete", "do", "else", "elseif", "false", "if", "let", "null", "return", "Store", "true", "until"],
             error = false,
@@ -69,16 +72,52 @@
                 return false;
             },
             tokenpush = function sl_tokenpush() {
-                if (ltype === "reference") {
-                    if 
+                len = len + 1;
+                if (ltoke === "{" || len < 1) {
+                    scopes.push(len);
+                    (function sl_tokenpush_chains() {
+                        var chains = [],
+                            x = 0,
+                            y = scopes.length;
+                        do {
+                            chains.push(scopes[x]);
+                            x = x + 1;
+                        } while (x < y);
+                        chain.push(chains);
+                    }());
+                    scope.push({
+                        "const" : [],
+                        "let"   : []
+                    });
                 } else {
-                    dtype.push("");
-                    lengt.push(0);
+                    if (ltoke === "}") {
+                        scopes.pop();
+                    }
+                    chain.push([]);
+                    scope.push({});
                 }
                 token.push(ltoke);
                 types.push(ltype);
                 begin.push(deepness[deepness.length - 1][0]);
                 depth.push(deepness[deepness.length - 1][1]);
+                if (ltype === "reference") {
+                    if (depth[len] === "let" || depth[len] === "const") {
+                        claim.push(scopes[scopes.length - 1]);
+                    } else {
+                        (function sl_tokenpush_claims() {
+                            var x = scopes.length - 1;
+                            do {
+                                if (scope[scopes[x]].let.indexOf(ltoke) > -1 || scope[scopes[x]].const.indexOf(ltoke) > -1) {
+                                    return claim.push(scopes[x]);
+                                }
+                                x = x - 1;
+                            } while (x > -1);
+                            parseError("Undeclared reference: " + ltoke);
+                        }());
+                    }
+                } else {
+                    claim.push(-1);
+                }
             },
             white = function sl_white() {
                 var x = a;
@@ -154,9 +193,8 @@
             operator = function sl_operator() {
                 var extranext = "",
                     cline = line,
-                    ccol  = col,
-                    d     = token.length - 1;
-                if (c[a] === ":" && depth[d] !== "let" && depth[d] !== "const" && (next === "+" || next === "-" || next === "*" || next === "/" || next === "^" || next === "%")) {
+                    ccol  = col;
+                if (c[a] === ":" && depth[len] !== "let" && depth[len] !== "const" && (next === "+" || next === "-" || next === "*" || next === "/" || next === "^" || next === "%")) {
                     ltoke = ":" + next;
                     a = a + 1;
                     extranext = a;
@@ -207,14 +245,17 @@
                         return "<";
                     }());
                 } else {
-                    if (types[d] !== "reference" && (c[a] === "+" || c[a] === "-") && ".0123456789".indexOf(next) > -1 && ((depth[d] !== "let" && depth[d] !== "const") || ltoke === ":")) {
+                    if (types[len] !== "reference" && (c[a] === "+" || c[a] === "-") && ".0123456789".indexOf(next) > -1 && ((depth[len] !== "let" && depth[len] !== "const") || ltoke === ":")) {
                         return number();
                     }
                     ltoke = c[a];
                 }
                 if (ltoke === ":") {
-                    if (types[d] === "keyword") {
-                        return parseError("Reference error, use of a reserved word: " + token[d]);
+                    if (types[len] === "keyword") {
+                        return parseError("Reference error, use of a reserved word: " + token[len]);
+                    }
+                    if (types[len] === "reference" && (depth[len] === "let" || depth[len] === "const")) {
+                        scope[begin[begin[len] - 1]][depth[len]].push(token[len]);
                     }
                 }
                 ltype = "operator";
@@ -310,7 +351,7 @@
                 a = a - 1;
                 ltoke = output.join("");
                 if (ltoke === "let" || ltoke === "const") {
-                    x = token.length - 1;
+                    x = len;
                     if (types[x] === "comment") {
                         do {
                             x = x - 1;
@@ -327,10 +368,10 @@
                         }
                     }
                 }
-                if (ltoke === "until" && token[token.length - 1] !== "}" && depth[depth.length - 1] !== "do") {
+                if (ltoke === "until" && token[len] !== "}" && depth[len] !== "do") {
                     return parseError("Parse error, keyword 'until' not following a 'do' block.");
                 }
-                if (ltoke !== "until" && token[token.length - 1] === "}" && depth[depth.length - 1] === "do") {
+                if (ltoke !== "until" && token[len] === "}" && depth[len] === "do") {
                     return parseError("Parse error, 'do' block not followed by word 'until'.");
                 }
                 if (reserved.indexOf(ltoke) > -1) {
@@ -369,7 +410,7 @@
                 }*/
             },
             start = function sl_start() {
-                var hint  = token[[begin[begin.length - 1]] - 1],
+                var hint  = token[[begin[len]] - 1],
                     name  = "";
                 if (c[a] === "(") {
                     if (ltoke === "until" || ltoke === "let" || ltoke === "const") {

@@ -11,6 +11,7 @@
             longest = [],
             longestv = [],
             keys = [],
+            debug = (process.argv.indexOf("--debug") > 0),
             str  = "",
             a = 0,
             b = 0,
@@ -68,7 +69,9 @@
                 }
                 b = b + 1;
             } while (b < c);
-            console.log(formatted[a].join(" "));
+            if (debug === false) {
+                console.log(formatted[a].join(" "));
+            }
             a = a + 1;
         } while (a < len);
     });

@@ -20,6 +20,8 @@ An eductional language to speed learning of logic and automation with sacrifice 
 * investigate Set containers: access, iteration, use cases
 * evaluate chosen number format to determine if words can start with numbers
 * The return function will terminate a block.  Investigate if this is a problem where a function contains numerous blocks.
+* should references be unique to their scope chain
+* The parens for function argument declarations are overloaded syntax.  I need to find different characters for those parens.
 
 ### Tasks
 * document explicit error states
@@ -44,7 +46,7 @@ Simple Language is designed to be single paradigm with a cleaner syntax.  The go
 * no inheritance/this/new
 * implicit public/private
 * no try/catch
-* no operator overloading
+* minimize syntax overloading
 * no bitwise
 * no implied syntax or automatic syntax character insertion.  Syntax is explicit.
 * data types are strong/static
@@ -73,12 +75,18 @@ Unclosed comments will not generate a parse error.  The unclosed comment will co
 
 
 ## Syntax
+### Overloaded characters
+* `<>`
+   - *Comparison operators* - Most commonly angle braces exist as less than and greater than comparison operators.
+   - *Trichotomy operator* - If these characters are present with the equality operator between them they form the trichotomy operator: `<=>`.
+   - *Function argument declaration* - If a less than character immediately follows the assignment operator it opens a structure for declaring function operations.  This structure terminates with a greater than character and the following character is expected to be a curly brace. This following block is a function body.
+
 ### Comparison operators
 * `=` equality
 * `~` inequality
 * `<` less than
 * `>` greater than
-* `<=>` trichotomy // returns -1, 0, or 1 if respectively: less, equal, or greater //
+* `<=>` trichotomy, returns -1, 0, or 1 if respectively: less, equal, or greater
 * `&` logical and
 * `|` logical or
 
@@ -87,8 +95,8 @@ Unclosed comments will not generate a parse error.  The unclosed comment will co
 * `)` logical group end
 * `{` block start
 * `}` block end
-* `[` array notation start
-* `]` array notation end
+* `[` property start
+* `]` property end
 * \` regular expression start and end
 
 ### Assignment/reference operators
@@ -120,6 +128,44 @@ Unclosed comments will not generate a parse error.  The unclosed comment will co
 * `"` string delimiter
 * `'` string delimiter
 * `.` number decimal separator (only available in number data types)
+
+### Unicode Character Entities
+Unicode character entities are only available within strings.
+
+* `\uXXXX` where X represents a hexadecimal digit 0-9 or a-f, for example `\u039b` would evaluate to Greek capital Lambda.  This 4 character entity form a single byte Unicode code point is specified.
+* `\u{XXXXX}` where X represents a hexadecimal digit 0-9 or a-f.  This 5 character entity evaluates to a double byte Unicode character.  `\u{220a3}` is identical to `\ud848\udca3`
+
+An incomplete Unicode character entity will generate an error.
+
+### Recognized White Space Characters
+* `\u0009` - tab
+* `\u000a` - line feed (LF)
+* `\u000c` - form feed (FF)
+* `\u000d` - carriage return (CR)
+* `\u0020` - space
+* `\u00a0` - no-break space
+* `\u1680` - ogham space mark
+* `\u180e` - mongolian vowel separator
+* `\u2000` - en quad
+* `\u2001` - em quad
+* `\u2002` - en space
+* `\u2003` - em space
+* `\u2004` - three-per-em space
+* `\u2005` - four-per-em space
+* `\u2006` - six-per-em space
+* `\u2007` - figure space
+* `\u2008` - punctuation space
+* `\u2009` - thin space
+* `\u200a` - hair space
+* `\u2028` - line separator
+* `\u2029` - paragraph separator
+* `\u202f` - narrow no-break space
+* `\u205f` - medium mathematical space
+* `\u2b7f` - vertical tab
+* `\u3000` - ideographic space
+* `\ufeff` - zero-width non-breaking space
+
+Please note that non-visible white space characters that exist as gramatic constructs to bind or separate words are deliberately excluded from this list: \u200b, \u200c, \u200d, \u2060, \u2063.
 
 ### Words: keywords and references
 Words may be comprised of any Unicode character with exception to the following list:
@@ -155,14 +201,14 @@ It should be noted that null values exist in this language, but are not a data t
 
 #### Non-primitives (passed by reference)
 * function - A bag of instructions that accepts parameters for input and always returns a value, where that value is the function itself by default if the return function isn't specified.
-   - Declared by applying a parenthsis grouping prior to a block.
-   - `cat: () {console.log("meow");}`
+   - Declared by applying a angle brace delimiters between assignment and a block.
+   - `cat: <> {console.log("meow");}`
    - Executed when a parethesis grouping follows the function's reference.
    - `cat(); // returns the actual function because a return value isn't specific and executes its instructions //`
    - Without the following parenthesis the reference to the function itself is passed without executing the function.
    - `cat; // returns the actual function without executing its instructions //`
    - Provide the return function to specify output for the function.
-   - `cat: (x:"number") {return(x + 1)}; cat(3); // returns 4`
+   - `cat: <x:"number"> {return(x + 1)}; cat(3); // returns 4`
 * array - A list of dynamic length where keys are 0 based incrementing integers and values are of any data type. Every index must have a value.  Sparse arrays will throw an error.
    - Declared by use of the global Store hash's array property.
    - `animals: Store.array("cat", "dog", "parrot")`
@@ -198,7 +244,7 @@ The types array, hash, map, and set are all iterable.  Except for arrays, the co
 The function data type is unique in that this is the only data type that receives input into locally created referrences called *arguments* or *parameters*.  When these arguments are declared they must be assigned to a string value representing a data type.  The absence of this assignment will cause a parse error.  Any value is permitted for this string, including an empty string, to avoid a parse error.  The referrence or value submitted to the function in position of this argument must match the assigned data type or a type error will be thrown.  Here are some examples:
 
 ```
-let(myFunction: (source: "string", index: "number") {
+let(myFunction: <source: "string", index: "number"> {
     return();
 });
 myFunction("a big long string", 1234); // good //
@@ -206,7 +252,7 @@ myFunction(12, 1234); // type error, because the first argument expects a value 
 ```
 
 ```
-let(myFunction: (source: "myCustomType", index: "number") {
+let(myFunction: <source: "myCustomType", index: "number"> {
     return();
 });
 myFunction("a big long string", 1234); // type error, //
@@ -215,7 +261,7 @@ myFunction("a big long string", 1234); // type error, //
 ```
 
 ```
-let(myFunction: (source, index) {
+let(myFunction: <source, index> {
     return();
 });
 // parse error, a function is declared with arguments, //
@@ -437,7 +483,7 @@ Store is a predefined globally scoped hash provided by the language.  It contain
 Simple Language provideds a method *modifyType* on the Store hash for creating custom data types.  This method has special access to write a custom value to the read only *type* property on a reference.  This method takes two arguments: a function and a string for the new type name.  Any string is allowed except for the names of the existing types whether they are standard types or custom types.  The return value of the function, in the first argument, is the base model for the new type.  The new type value will be available as a property of the global Store hash.
 ```
 Store["modifyType"]((){
-    let(myFunction: (sample: "string") {
+    let(myFunction: <sample: "string"> {
         return sample.slice(0, 3);
     });
     return myFunction;

@@ -9,10 +9,10 @@
 // "options" is externally defined and //
 // would be included into this file//
 let(
-    csvpretty: (options: "hash") {
+    csvpretty: <options:"hash"> {
         let(
             token   : Store["array"],
-            tokenize: () {
+            tokenize: <> {
                 let(
                     input     : options["source"]["split"](""),
                     d         : options["csvchar"]["length"],
@@ -20,14 +20,14 @@ let(
                     cell      : Store["array"],
                     row       : Store["array"],
                     quote     : false,
-                    cellCrunch: () {
+                    cellCrunch: <> {
                         let(str: cell["join"](""));
                         cell: Store["array"];
                         if (str ~ "") {
                             row["push"](str);
                         }
                     },
-                    parse     : (item: "string", index: "number", arr: "array") {
+                    parse     : <item: "string", index: "number", arr: "array"> {
                         let(quoteFalse: {
                             if (
                                 cell["length"] = 0 &
