@@ -38,7 +38,11 @@
             formatted.push([]);
             b = 0;
             do {
-                str = output[keys[b]][a].toString();
+                if (typeof output[keys[b]][a] === "object") {
+                    str = JSON.stringify(output[keys[b]][a]);
+                } else {
+                    str = output[keys[b]][a].toString();
+                }
                 formatted[a].push(str);
                 if (str.length > longest[b]) {
                     longest[b] = str.length;
@@ -59,10 +63,10 @@
                 }
                 if (d < longest[b]) {
                     do {
-                        if (b < c - 1) {
-                            formatted[a][b] = formatted[a][b] + " ";
-                        } else {
+                        if (b === 3 || b === 4) {
                             formatted[a][b] = " " + formatted[a][b];
+                        } else {
+                            formatted[a][b] = formatted[a][b] + " ";
                         }
                         d = d + 1;
                     } while (d < longest[b]);

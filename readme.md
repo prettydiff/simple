@@ -34,7 +34,12 @@ An eductional language to speed learning of logic and automation with sacrifice 
 ## Motivation
 According to data from multiple sources JavaScript is the most popular language in the world.  Unfortunately, it is rarely formally taught, and most developers cannot adequetely figure it out so as to become competent without significant help.  Worse still is that there are many pitfalls in JavaScript that frequently trip up and slow down seasoned experts without help from static analysis tools.  Worst of all is that JavaScript has no shortage of controversy and inflated holy wars.  These are all problems that can be solved provided the language were designed with these problems in mind.
 
-Simple Language is designed to be single paradigm with a cleaner syntax.  The goal is to provide a language that is easy to learn and teach minimizing frustration, pitfalls, and controversy along the way.
+Simple Language is designed to be single paradigm language with syntax that isn't open to confusion.  The goal is to provide a language that is easy for programmers of all levels to understand without sacrifice to performance or expressiveness.
+
+
+
+## Execution
+A language interpreter will be coming soon.  In the mean time I am writing the first parser in JavaScript.  The actual parser file is API agnostic, but a helper file for reading files and writing a parse table to console is available for execution with Node.js.
 
 
 

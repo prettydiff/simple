@@ -6,7 +6,7 @@
         var a = 0,
             c = input.split(""),
             b = c.length,
-            token = [], 
+            token = [],
             types = [],
             depth = [],
             begin = [],
@@ -15,6 +15,7 @@
             claim = [],
             scope = [],
             scopes = [],
+            argstore = {},
             deepness = [[0, "global"]],
             next  = "",
             ltoke = "",
@@ -73,8 +74,13 @@
             },
             tokenpush = function sl_tokenpush() {
                 len = len + 1;
+                token.push(ltoke);
+                types.push(ltype);
+                begin.push(deepness[deepness.length - 1][0]);
+                depth.push(deepness[deepness.length - 1][1]);
                 if (ltoke === "{" || len < 1) {
                     scopes.push(len);
+                    claim.push(-1);
                     (function sl_tokenpush_chains() {
                         var chains = [],
                             x = 0,
@@ -89,34 +95,50 @@
                         "const" : [],
                         "let"   : []
                     });
+                    if (token[len - 1] === ">") {
+                        (function so_tokenpush_arguments() {
+                            var args = Object.keys(argstore[begin[len - 1]]),
+                                x = 0,
+                                y = args.length;
+                            do {
+                                scope[len].let.push(args[x]);
+                                claim[argstore[begin[len - 1]][args[x]]] = len;
+                                x = x + 1;
+                            } while (x < y);
+                            delete argstore[begin[len - 1]];
+                        }());
+                    }
+                } else if (ltoke === "<" && ltype === "start") {
+                    argstore[len] = {};
+                    chain.push([]);
+                    scope.push({});
+                    claim.push(-1);
                 } else {
                     if (ltoke === "}") {
                         scopes.pop();
                     }
                     chain.push([]);
                     scope.push({});
-                }
-                token.push(ltoke);
-                types.push(ltype);
-                begin.push(deepness[deepness.length - 1][0]);
-                depth.push(deepness[deepness.length - 1][1]);
-                if (ltype === "reference") {
-                    if (depth[len] === "let" || depth[len] === "const") {
-                        claim.push(scopes[scopes.length - 1]);
-                    } else {
-                        (function sl_tokenpush_claims() {
-                            var x = scopes.length - 1;
-                            do {
-                                if (scope[scopes[x]].let.indexOf(ltoke) > -1 || scope[scopes[x]].const.indexOf(ltoke) > -1) {
-                                    return claim.push(scopes[x]);
-                                }
-                                x = x - 1;
-                            } while (x > -1);
+                    if (ltype === "reference") {
+                        if (depth[len] === "let" || depth[len] === "const") {
+                            claim.push(scopes[scopes.length - 1]);
+                        } else if (depth[len] !== "arguments") {
+                            (function sl_tokenpush_claims() {
+                                var x = scopes.length - 1;
+                                do {
+                                    if (scope[scopes[x]].let.indexOf(ltoke) > -1 || scope[scopes[x]].const.indexOf(ltoke) > -1) {
+                                        return claim.push(scopes[x]);
+                                    }
+                                    x = x - 1;
+                                } while (x > -1);
                             parseError("Undeclared reference: " + ltoke);
-                        }());
+                            }());
+                        } else {
+                            claim.push(-1);
+                        }
+                    } else {
+                        claim.push(-1);
                     }
-                } else {
-                    claim.push(-1);
                 }
             },
             white = function sl_white() {
@@ -254,8 +276,12 @@
                     if (types[len] === "keyword") {
                         return parseError("Reference error, use of a reserved word: " + token[len]);
                     }
-                    if (types[len] === "reference" && (depth[len] === "let" || depth[len] === "const")) {
-                        scope[begin[begin[len] - 1]][depth[len]].push(token[len]);
+                    if (types[len] === "reference") {
+                        if (depth[len] === "let" || depth[len] === "const") {
+                            scope[begin[begin[len] - 1]][depth[len]].push(token[len]);
+                        } else if (depth[len] === "arguments") {
+                            argstore[begin[len]][token[len]] = len;
+                        }
                     }
                 }
                 ltype = "operator";
@@ -424,11 +450,11 @@
                     }
                 } else if (c[a] === "[") {
                     name = "property";
+                } else if (c[a] === "<") {
+                    name = "arguments";
                 } else if (ltoke === ")" && c[a] === "{") {
                     if (hint === "if" || hint === "elseif") {
                         name = "if";
-                    } else if (hint === ":") {
-                        name = "function";
                     } else {
                         name = "block";
                     }
@@ -475,16 +501,16 @@
             } else if (c[a] === "`") {
                 ltype = "regex";
                 generic("`");
+            } else if (c[a] === "(" || c[a] === "[" || c[a] === "{" || (c[a] === "<" && ltoke === ":")) {
+                start();
+            } else if (c[a] === ")" || c[a] === "]" || c[a] === "}" || (c[a] === ">" && depth[len] === "arguments")) {
+                end();
             } else if (ops.indexOf(c[a]) > -1) {
                 operator();
             } else if (c[a] === "," || c[a] === ";") {
                 ltype = "separator";
                 ltoke = c[a];
                 tokenpush();
-            } else if (c[a] === "(" || c[a] === "[" || c[a] === "{") {
-                start();
-            } else if (c[a] === ")" || c[a] === "]" || c[a] === "}") {
-                end();
             } else if ("+-.0123456789".indexOf(c[a]) > -1) {
                 number();
             } else {
@@ -493,10 +519,20 @@
             a = a + 1;
         } while (a < b);
         return {
+            // * token - parsed code
+            // * types - parsed token category (not data type)
+            // * depth - the code structure in which the token resides
+            // * begin - token index of "depth" start
+            // * claim - where in the scope chain a reference is declared, only populated on references
+            // * chain - index list of scope chain, only populated "{" tokens
+            // * scope - references declared to the local block, only populated "{" tokens
             token: token,
             types: types,
             depth: depth,
-            begin: begin
+            begin: begin,
+            claim: claim,
+            chain: chain,
+            scope: scope
         };
     };
     if (typeof module === "object") {
